@@ -70,6 +70,12 @@ const isOutsideClicked = (event) => {
         <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
             <i class="pi pi-bars"></i>
         </button>
+        <!-- <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
+            <i class="pi pi-bars"></i>
+        </button>
+        <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
+            <i class="pi pi-bars"></i>
+        </button> -->
 
         <button class="p-link layout-topbar-menu-button layout-topbar-button" @click="onTopBarMenuButton()">
             <i class="pi pi-ellipsis-v"></i>

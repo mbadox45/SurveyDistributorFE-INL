@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import AppLayout from '@/layout/AppLayout.vue';
+import AppLayout2 from '@/layout/layout_sso/AppLayout.vue';
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -144,6 +145,55 @@ const router = createRouter({
             ]
         },
         {
+            path: '/',
+            component: AppLayout2,
+            children: [
+                {
+                    path: '/home',
+                    name: 'home',
+                    component: () => import('@/views/sso/Home.vue'),
+                    meta:{
+                        requiresAuth: true,
+                    }
+                },
+                {
+                    path: '/user-profile',
+                    name: 'userprofile',
+                    component: () => import('@/views/sso/UserProfile.vue'),
+                    meta:{
+                        requiresAuth: true,
+                    }
+                },
+                {
+                    path: '/management-user',
+                    name: 'managementuser',
+                    component: () => import('@/views/sso/ManagementUser.vue'),
+                    meta:{
+                        requiresAuth: true,
+                    }
+                },
+
+                {
+                    path: '/master-apps',
+                    name: 'masterapps',
+                    component: () => import('@/views/sso/MasterApps.vue'),
+                    children: [
+                        {
+                            path: '/master-apps',
+                            component: () => import('@/views/sso/master/Apps.vue')
+                        },
+                        {
+                            path: '/master-apps/akses',
+                            component: () => import('@/views/sso/master/Akses.vue')
+                        },
+                    ],
+                    meta:{
+                        requiresAuth: true,
+                    },
+                },
+            ]
+        },
+        {
             path: '/landing',
             name: 'landing',
             component: () => import('@/views/pages/Landing.vue')
@@ -157,7 +207,10 @@ const router = createRouter({
         {
             path: '/auth/login',
             name: 'login',
-            component: () => import('@/views/pages/auth/Login.vue')
+            component: () => import('@/views/pages/auth/Login2.vue'),
+            meta:{
+                guestOnly:true,
+            }
         },
         {
             path: '/auth/access',
@@ -171,5 +224,25 @@ const router = createRouter({
         }
     ]
 });
+
+router.beforeEach((to, from, next) => {
+    const tokens = localStorage.getItem('usertoken') != null;
+
+    if (to.matched.some((route) => route.meta.requiresAuth)) {
+        if (tokens) {
+            next();
+        } else {
+            next('/auth/login');
+        }
+    } else if (to.matched.some((route) => route.meta.guestOnly)) {
+        if (tokens) {
+            next('/home');
+        } else {
+            next();
+        }
+    } else {
+        next();
+    }
+})
 
 export default router;
