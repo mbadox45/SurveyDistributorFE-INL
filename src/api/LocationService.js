@@ -1,8 +1,14 @@
 import http from "./http-common";
+import { baseURL, header } from "./http-auth2";
 
 class LocationService {
-    getProv(){
-        return http.get('load/prov');
+    async getProv(){
+        // return await fetch(`${baseURL}load/prov`, {
+        //     headers:header
+        // })
+        // .then((res) => res.json())
+        // .then((d) => d.data);
+        return await http.get('load/prov');
     }
     getProvID(id_prov){
         return http.get(`detail/prov/${id_prov}`);

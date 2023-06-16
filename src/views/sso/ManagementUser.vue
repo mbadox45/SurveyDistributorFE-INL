@@ -1,81 +1,66 @@
-<script>
+<script setup>
 
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { onMounted, onBeforeMount, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import ProductService from '@/service/ProductService';
 import UserService from '@/api/UserService';
 
-export default {
-    setup(){
-        const payload = JSON.parse(localStorage.getItem('payload'));
-        const breadcrumbHome = ref({ icon: 'pi pi-home', to: '/home' });
-        const breadcrumbItems = ref([{ label: 'Home', to:'/home' }, { label: 'Management User', class:'font-bold' }]);
-        
-        const products = ref(null);
-        const users = ref(null);
-        const filters1 = ref(null);
+const router = useRouter();
 
-        const productService = new ProductService();
+const payload = JSON.parse(localStorage.getItem('payload'));
+const breadcrumbHome = ref({ icon: 'pi pi-home', to: '/home' });
+const breadcrumbItems = ref([{ label: 'Home', to:'/home' }, { label: 'Management User', class:'font-bold', disabled:true }]);
 
-        const loadUser = () => {
-            UserService.getUser().then(res => {
-                const load = res.data;
-                if (load.code == 200) {
-                    const data = load.data;
-                    const list = [];
-                    for (let i = 0; i < data.length; i++) {
-                        list[i] = {
-                            no: i+1,
-                            nrk: data[i].nrk,
-                            name: data[i].name,
-                            jabatan: data[i].jabatan,
-                            divisi: data[i].divisi,
-                            departemen: data[i].departemen,
-                        }
-                    }
-                    users.value = list;
-                    console.log(list)
-                } else {
-                    console.log('tidak ada')
+const displayConfirmation = ref(false);
+const users = ref(null);
+const filters1 = ref(null);
+
+const loadUser = () => {
+    console.log(localStorage.getItem('usertoken'));
+    UserService.getUser().then(res => {
+        const load = res;
+        if (load.length > 0) {
+            const list = [];
+            for (let i = 0; i < load.length; i++) {
+                list[i] = {
+                    no: i+1,
+                    id: load[i].id,
+                    nrk: load[i].nrk,
+                    name: load[i].name,
+                    jabatan: load[i].jabatan,
+                    divisi: load[i].divisi,
+                    departemen: load[i].departemen,
                 }
-            })
+            }
+            users.value = list;
+        } else {
+            console.log('tidak ada')
         }
-
-        const Produk = () => {
-            productService.getProductsSmall().then((data) => {
-                products.value = data
-                console.log(data)
-            });
-            // console.log(products);
-        }
-
-        const formatCurrency = (value) => {
-            return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-        };
-
-        const initFilters1 = () => {
-            filters1.value = {
-                global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            };
-        };
-
-        onBeforeMount(() => {
-            initFilters1()
-        });
-
-        onMounted(() => {
-            // Produk();
-            loadUser();
-            // loadDataProv();
-            // funcSelected();
-        });
-
-        return{
-            payload, breadcrumbHome, breadcrumbItems, users, products, formatCurrency, filters1
-        }
-    }
+    })
 }
+
+const linkDirection = (link) => {
+    router.push(link)
+    // displayConfirmation.value = true;
+};
+
+const addUserDialogClose = () => {
+    displayConfirmation.value = false;
+};
+
+const initFilters1 = () => {
+    filters1.value = {
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    };
+};
+
+onBeforeMount(() => {
+    initFilters1()
+});
+
+onMounted(() => {
+    loadUser();
+});
 </script>
 
 <template>
@@ -86,18 +71,28 @@ export default {
         <div class="col-12 md:col-12">
             <div class="card">
                 <h5>Table Users</h5>
+                <Dialog header="Confirmation" v-model:visible="displayConfirmation" :style="{width:'80rem'}" :modal="true">
+                    <div class="flex align-items-center justify-content-center">
+                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
+                        <span>Are you sure you want to proceed?</span>
+                    </div>
+                    <template #footer>
+                        <Button label="No" icon="pi pi-times" @click="addUserDialogClose" class="p-button-text" />
+                        <Button label="Yes" icon="pi pi-check" @click="addUserDialogClose" class="p-button-text" autofocus />
+                    </template>
+                </Dialog>
                 <DataTable :value="users" :rows="10" :paginator="true" responsiveLayout="scroll" :filters="filters1" v-model:filters="filters1">
                     <template #header>
                         <div class="flex justify-content-between flex-column sm:flex-row">
-                            <Button type="button" icon="pi pi-plus" label="Add User" class="p-button-outlined mb-2"/>
+                            <Button type="button" icon="pi pi-plus" label="Add User" class="p-button-outlined mb-2" @click="linkDirection('/add-user')"/>
                             <span class="p-input-icon-left mb-2">
                                 <i class="pi pi-search" />
                                 <InputText v-model="filters1['global'].value" placeholder="Keyword Search" style="width: 100%" />
                             </span>
                         </div>
                     </template>
-                    <template #empty> No customers found. </template>
-                    <template #loading> Loading customers data. Please wait. </template>
+                    <template #empty> Data not found. </template>
+                    <template #loading> Loading data. Please wait. </template>
                     <Column field="no" header="No" :sortable="false" style="width: 5%"></Column>
                     <Column field="nrk" header="ID Karyawan" :sortable="true" style="width: 15%"></Column>
                     <Column field="name" header="Nama" :sortable="true" style="width: 25%"></Column>
@@ -108,9 +103,9 @@ export default {
                         <template #header> 
                             <div class="text-center w-full">#</div> 
                         </template>
-                        <template #body>
+                        <template #body="slotProps">
                             <div class="flex">
-                                <Button icon="pi pi-pencil" type="button" class="p-button-text p-button-warning"></Button>
+                                <Button icon="pi pi-pencil" type="button" class="p-button-text p-button-warning" @click="linkDirection(`/edit-user/${slotProps.data.id}`)"></Button>
                                 <Button icon="pi pi-trash" type="button" class="p-button-text p-button-danger"></Button>
                             </div>
                         </template>

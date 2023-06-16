@@ -7,6 +7,7 @@ const { layoutConfig, onMenuToggle } = useLayout();
 
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
+const displayConfirmation = ref(false);
 const router = useRouter();
 const payload = JSON.parse(localStorage.getItem('payload'));
 
@@ -25,15 +26,13 @@ const logoUrl = computed(() => {
 const onTopBarMenuButton = () => {
     topbarMenuActive.value = !topbarMenuActive.value;
 };
-const onTopBarMenuButton2 = () => {
+const logoutAction = () => {
+    displayConfirmation.value = false;
     localStorage.removeItem('usertoken');
     localStorage.removeItem('payload');
     router.push('/auth/login')
 };
-// const onSettingsClick = () => {
-//     topbarMenuActive.value = false;
-//     router.push('/documentation');
-// };
+
 const onSettingsClick = (link) => {
     router.push(link);
 };
@@ -105,19 +104,32 @@ const isOutsideClicked = (event) => {
                 <i class="pi pi-user"></i>
                 <span>User Profile</span>
             </button>
-            <button @click="onSettingsClick('/management-user')" class="p-link layout-topbar-button" title="Management User">
+            <button @click="onSettingsClick('/management-user')" class="p-link layout-topbar-button" title="Management User" v-show="payload.jabatan == 'super_admin'">
                 <i class="pi pi-sitemap"></i>
                 <span>Management User</span>
             </button>
-            <button @click="onSettingsClick('/master-apps')" class="p-link layout-topbar-button" title="Master Apps">
+            <button @click="onSettingsClick('/master-apps')" class="p-link layout-topbar-button" title="Master Apps" v-show="payload.jabatan == 'super_admin'">
                 <i class="pi pi-desktop"></i>
                 <span>Master Apps</span>
             </button>
-            <button @click="onTopBarMenuButton2()" class="p-link layout-topbar-button" title="Sign Out">
+            <button @click="displayConfirmation = true" class="p-link layout-topbar-button" title="Sign Out">
                 <i class="pi pi-sign-out"></i>
                 <span>Sign Out</span>
             </button>
         </div>
+        <Dialog v-model:visible="displayConfirmation" :style="{ width: '350px' }" :modal="true" position="topright" :draggable="false">
+            <template #header>
+                <h4>Sign Out</h4>
+            </template>
+            <div class="flex align-items-center justify-content-center">
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem; color:red;" />
+                <span class="font-semibold">Do you want to exit this session?</span>
+            </div>
+            <template #footer>
+                <Button label="No" icon="pi pi-times" @click="displayConfirmation = false" class="p-button-text p-button-secondary" />
+                <Button label="Yes" icon="pi pi-check" @click="logoutAction" class="p-button-danger" autofocus />
+            </template>
+        </Dialog>
     </div>
 </template>
 

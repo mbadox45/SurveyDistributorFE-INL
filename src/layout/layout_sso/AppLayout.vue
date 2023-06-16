@@ -1,43 +1,21 @@
 <script setup>
-import { computed, watch, ref } from 'vue';
+import { computed, watch, onMounted, ref } from 'vue';
 import AppTopbar from './AppTopbar.vue';
 import AppFooter from '../AppFooter.vue';
+import { useRouter } from 'vue-router';
 // import AppSidebar from './AppSidebar.vue';
 // import AppConfig from './AppConfig.vue';
 import { useLayout } from '@/layout/composables/layout2';
+
+const router = useRouter();
 
 const { layoutConfig, layoutState, isSidebarActive } = useLayout();
 
 const outsideClickListener = ref(null);
 
-const menuitems = ref([
-    {
-        label: 'Customers',
-        items: [
-            {
-                label: 'New',
-                icon: 'pi pi-fw pi-plus'
-            },
-            {
-                label: 'Edit',
-                icon: 'pi pi-fw pi-user-edit'
-            }
-        ]
-    },
-    {
-        label: 'Orders',
-        items: [
-            {
-                label: 'View',
-                icon: 'pi pi-fw pi-list'
-            },
-            {
-                label: 'Search',
-                icon: 'pi pi-fw pi-search'
-            }
-        ]
-    }
-]);
+onMounted(() => {
+    tokenChecker();
+});
 
 watch(isSidebarActive, (newVal) => {
     if (newVal) {
@@ -60,6 +38,37 @@ const containerClass = computed(() => {
         'p-ripple-disabled': !layoutConfig.ripple.value
     };
 });
+
+const tokenChecker = () => {
+    const token = localStorage.getItem('usertoken');
+    
+    if (token) {
+        const tokenData = parseJwt(token);
+        const expirationTime = tokenData.exp * 1000; // Convert expiration time to milliseconds
+
+        if (Date.now() > expirationTime) {
+            // Token has expired, remove it from localStorage
+            localStorage.removeItem('usertoken');
+            localStorage.removeItem('payload');
+            router.push('/auth/login');
+            console.log('expired');
+        } else {
+            console.log('Token activated');
+            // config.headers['Authorization'] = `Bearer ${token}`;
+        }
+    }
+}
+
+const parseJwt = (token) => {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
+
 const bindOutsideClickListener = () => {
     if (!outsideClickListener.value) {
         outsideClickListener.value = (event) => {
