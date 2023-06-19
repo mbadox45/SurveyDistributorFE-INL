@@ -35,17 +35,23 @@ const onSubmit = (e) => {
             AuthService.postSignIn(post).then(res => {
                 const load = res.data;
                 if (load.code == 200) {
+                    toast.add({ severity: 'success', summary: 'Successfully', detail: `Login successfully`, life: 3000 });
                     const token = load.token;
                     const payload = load.payload;
                     localStorage.setItem('usertoken', token);
                     localStorage.setItem('payload', JSON.stringify(payload));
                     router.push('/home');
                 } else {
-                    console.log(load.message);
+                    toast.add({ severity: 'warn', summary: 'Attention', detail: 'The password or email you entered is incorrect, please try again', life: 3000 });
+                    console.log(load);
                 }
+            }).catch(error => {
+                console.error(error.response.status);
+                toast.add({ severity: 'warn', summary: 'Attention', detail: 'The password or email you entered is incorrect, please try again', life: 3000 });
             })
         } catch (error) {
-            console.error(error);
+            toast.add({ severity: 'danger', summary: 'Attention', detail: 'Invalid process, please contact the ICT team', life: 3000 });
+            // console.error(error.response.status);
         } finally {
             isLoading.value = false
         }

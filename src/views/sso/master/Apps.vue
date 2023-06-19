@@ -113,8 +113,9 @@ const modalApps = (status,id) => {
 };
 
 const onUpload = (event) => {
+    // const file = event.files;
     const file = event.target.files;
-    form_apps.file = file;
+    // form_apps.value.file = file;
     console.log(file);
 }
 
@@ -123,35 +124,47 @@ const closeConfirmation = () => {
 };
 
 const submitData = (status) => {
-    const fileInput = form_apps.value.file;
-    const file = fileInput.files[0];
-    const formData = new FormData();
-    formData.append('logo_app', file);
-    formData.append('nama_app', form_apps.value.nama_app);
-    formData.append('url_app', form_apps.value.url_app);
     if (status == 'add') {
-        // const formData = new FormData();
+        const formData = {
+            logo_app: files.value.files[0],
+            nama_app: form_apps.value.nama_app,
+            url_app: form_apps.value.url_app
+        }
         AppService.addApp(formData).then(res => {
-            toast.add({ severity: 'success', summary: 'Successfully', detail: `Data saved successfully ${res}`, life: 3000 });
-            loadApp();
-            closeConfirmation()
+            const load = res.data;
+            if (load.code == 200) {
+                toast.add({ severity: 'success', summary: 'Successfully', detail: `Data saved successfully`, life: 3000 });
+                loadApp();
+                closeConfirmation()
+            } else {
+                toast.add({ severity: 'warn', summary: 'Caution', detail: `Process failed`, life: 3000 });
+                closeConfirmation()
+            }
         })
     } else {
-        // const formData = new FormData();
-        if (form_apps.value.file == null) {
-            formData.append('nama_app', form_apps.value.nama_app);
-            formData.append('url_app', form_apps.value.url_app);
+        let formData = {};
+        if (files.value == null) {
+            formData = {
+                nama_app: form_apps.value.nama_app,
+                url_app: form_apps.value.url_app
+            }
         } else {
-            // const formData = new FormData();
-            formData.append('logo_app', form_apps.value.file);
-            formData.append('nama_app', form_apps.value.nama_app);
-            formData.append('url_app', form_apps.value.url_app);
+            formData = {
+                logo_app: files.value.files[0],
+                nama_app: form_apps.value.nama_app,
+                url_app: form_apps.value.url_app
+            }
         }
         AppService.updateApp(form_apps.value.app_id ,formData).then(res => {
-            console.log(res);
-            toast.add({ severity: 'success', summary: 'Successfully', detail: `Updated successfully`, life: 3000 });
-            loadApp();
-            closeConfirmation()
+            const load = res.data;
+            if (load.code == 200) {
+                toast.add({ severity: 'success', summary: 'Successfully', detail: `Updated successfully`, life: 3000 });
+                loadApp();
+                closeConfirmation()
+            } else {
+                toast.add({ severity: 'warn', summary: 'Caution', detail: `Process failed`, life: 3000 });
+                closeConfirmation()
+            }
         })
     }
 }
@@ -189,13 +202,13 @@ onMounted(() => {
                         </div>
                         <div class="field col-12 md:col-12">
                             <label for="firstname2">Logo Aplikasi</label><br>
-                            <!-- <input type="file" accept="image/*" ref="fileInput"/> -->
-                            <FileUpload mode="basic" name="demo" @change="onUpload" accept="image/*" type="file" v-model="form_apps.file" :maxFileSize="1000000" customUpload />
+                            <input type="file" accept="image/*" ref="files" placeholder="Logo Aplikasi" class="p-button-success py-2"/>
+                            <!-- <FileUpload mode="basic" name="demo" accept="image/*" type="file" v-model="files" :maxFileSize="1000000" customUpload /> -->
+                            <!-- <InputText id="email" type="file" v-model="form_apps.file"/> -->
                         </div>
                         <div class="field col-12 md:col-12" v-if="titleModal=='Edit Apps'">
-                            <label for="firstname2">Gambar</label>
-                            <!-- <FileUpload mode="basic" name="demo" @uploader="onUpload" accept="image/*" v-model="form_apps.file" :maxFileSize="1000000" customUpload /> -->
-                            <!-- <InputText id="email" type="text" autocomplete="off" v-model="form_apps.logo_app"/> -->
+                            <!-- <label for="firstname2">Gambar</label> -->
+                            <!-- <img :src="form_apps.logo_app" alt="Logo App" width="50"> -->
                         </div>
                     </div>
                     <template #footer>

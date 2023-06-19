@@ -63,6 +63,10 @@ class UserService {
         .then((res) => res.json())
         .then((d) => d.data);
     }
+
+    addPasswordUpdate(data){
+        return http.post(`password/update`, data);
+    }
 }
 
 export default new UserService;

@@ -231,6 +231,14 @@ const router = createRouter({
             }
         },
         // {
+        //     path: '/auth/login',
+        //     name: 'login',
+        //     component: () => import('@/views/pages/auth/Signin.vue'),
+        //     meta:{
+        //         guestOnly:true,
+        //     }
+        // },
+        // {
         //     path: '/auth/access',
         //     name: 'accessDenied',
         //     component: () => import('@/views/pages/auth/Access.vue')

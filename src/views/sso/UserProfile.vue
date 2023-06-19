@@ -57,6 +57,7 @@ onMounted(() => {
 
 // Function
 const loadUsers = async () => {
+    // console.log(payload);
     UserService.getUserID(payload.sub).then(res => {
         const load = res;
         // console.log(load)
@@ -164,7 +165,7 @@ const formatCurrency = (dis) => {
 // Dialog Change Password
 const dialogChangePassword = () => {
     dialogs.value = true;
-    email.value = null;
+    email.value = form_user.value.email;
     password.value = null;
     repassword.value = null;
 }
@@ -181,6 +182,25 @@ const syncRePassword = () => {
     }
 }
 
+const submitChangePassword = () => {
+    const data = {
+        email: email.value,
+        password: password.value
+    }
+    UserService.addPasswordUpdate(data).then(res => {
+        console.log(res);
+        const load = res.data;
+        if (load.code == 200) {
+            toast.add({ severity: 'success', summary: 'Successfully', detail: `Updated successfully`, life: 3000 });
+            loadUsers();
+            dialogs.value = false;
+        } else {
+            dialogs.value = false;
+            toast.add({ severity: 'warn', summary: 'Warning', detail: `Update failed (${load.code})`, life: 3000 });
+        }
+    })
+}
+
 </script>
 
 <template>
@@ -193,16 +213,16 @@ const syncRePassword = () => {
             <div class="p-fluid formgrid grid">
                 <div class="field col-12 md:col-12">
                     <label for="firstname2">Password</label>
-                    <Password id="password1" v-model="password" placeholder="Password" @input="syncRePassword" :feedback="false" :toggleMask="true" class="w-full mb-3" inputClass="w-full" inputStyle="padding:1rem"></Password>
+                    <Password id="password1" v-model="password" placeholder="Password" @input="syncRePassword" :feedback="true" :toggleMask="true" class="w-full mb-3" inputClass="w-full" inputStyle="padding:1rem"></Password>
                 </div>
                 <div class="field col-12 md:col-12">
                     <label for="firstname2">Re-Password</label>
-                    <Password id="password1" v-model="repassword" placeholder="Re-Password" @input="syncRePassword" :feedback="false" :toggleMask="true" class="w-full mb-3" inputClass="w-full" inputStyle="padding:1rem"></Password>
+                    <Password id="password1" v-model="repassword" placeholder="Re-Password" @input="syncRePassword" :feedback="true" :toggleMask="true" class="w-full mb-3" inputClass="w-full" inputStyle="padding:1rem"></Password>
                 </div>
             </div>
             <template #footer>
                 <Button label="No" icon="pi pi-times" @click="dialogs = false" class="p-button-outlined p-button-danger" />
-                <Button label="Save" icon="pi pi-save" @click="dialogs = false" class="p-button-outlined p-button-success" autofocus :disabled="disablebtnchangepass" />
+                <Button label="Save" icon="pi pi-save" @click="submitChangePassword" class="p-button-outlined p-button-success" autofocus :disabled="disablebtnchangepass" />
             </template>
         </Dialog>
         <div class="col-12 md:col-12">
