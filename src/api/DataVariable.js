@@ -1,3 +1,9 @@
+import moment from "moment/moment"
+const date_now = moment().format('DD-MM-YYYY')
+const date_ago =  moment().subtract(10, 'days').format('DD-MM-YYYY');
+
+
+// List for dropdown
 export const listAkses = [
     { name: 1, level_akses: 1 },
     { name: 2, level_akses: 2 },
@@ -9,169 +15,219 @@ export const listAkses = [
     { name: 8, level_akses: 8 },
     { name: 9, level_akses: 9 },
     { name: 10, level_akses: 10 },
-]
-
-export const listKelamin = [
-    { name: 'Pria', kelamin: 'LK' },
-    { name: 'Wanita', kelamin: 'PR' },
-]
-
-export const listStatusKawin = [
-    { name: 'Belum Kawin', statuskawin: 'belum menikah' },
-    { name: 'Kawin', statuskawin: 'menikah' },
-]
-
-export const listAgama = [
-    { name: 'Islam', agama: 'islam' },
-    { name: 'Protestan', agama: 'protestan' },
-    { name: 'Khatolik', agama: 'khatolik' },
-    { name: 'Hindu', agama: 'hindu' },
-    { name: 'Budha', agama: 'budha' },
-    { name: 'Konghucu', agama: 'konghucu' },
-]
-
-export const listPendidikan = [
-    { name: 'SD', pendidikan: 'sd' },
-    { name: 'SMP', pendidikan: 'smp' },
-    { name: 'SLTA Sederajat', pendidikan: 'sma' },
-    { name: 'D3', pendidikan: 'd3' },
-    { name: 'D4/S1', pendidikan: 's1' },
-    { name: 'S2', pendidikan: 's2' },
-    { name: 'S3', pendidikan: 's3' },
-]
-
-export const listDept = [
-    {departemen:'-', name:'-'},
-    {departemen:'Logistic Departement', name:'Logistic Departement'},
-    {departemen:'SEVP', name:'SEVP'},
-    {departemen:'Maintenance', name:'Maintenance'},
-    {departemen:'Komisaris', name:'Komisaris'},
-    {departemen:'Finance & Risk Management', name:'Finance & Risk Management'},
-    {departemen:'Operation Plant-I', name:'Operation Plant-I'},
-    {departemen:'Admin', name:'Admin'},
-    {departemen:'Sales Retail & Marketing Departement', name:'Sales Retail & Marketing Departement'},
-    {departemen:'HC&ICT', name:'HC&ICT'},
-    {departemen:'Sales & Marketing', name:'Sales & Marketing'},
-    {departemen:'FA Departement', name:'FA Departement'},
-    {departemen:'Operation', name:'Operation'},
-    {departemen:'Dirut', name:'Direktur Utama'},
-    {departemen:'Supply Chain Management', name:'Supply Chain Management'},
-    {departemen:'QSKM', name:'QSKM'},
-    {departemen:'HSSE', name:'HSSE'},
-    {departemen:'Corporate Secretary', name:'Corporate Secretary'},
-    {departemen:'Corporate Development', name:'Corporate Development'},
+];
+export const listRequired = [
+    { name: 'Required', require: 1 },
+    { name: 'Optional', require: 0 },
+];
+export const listCategory = [
+    { name: 'Kategori 1', category_id: 1 },
+    { name: 'Kategori 2', category_id: 2 },
+    { name: 'Kategori 3', category_id: 3 },
+];
+export const typeAnswer = [
+    { name: 'Text', type: 'text', icon:'/layout/icon/textinput.png' },
+    { name: 'Checkbox', type: 'checkbox', icon:'/layout/icon/checkbox.png' },
+    { name: 'Radio', type: 'radio', icon:'/layout/icon/radio.png' },
+    { name: 'Number', type: 'number', icon:'/layout/icon/number.png' },
+    { name: 'Dropdown', type: 'dropdown', icon:'/layout/icon/dropdown.png' },
+    { name: 'File', type: 'file', icon:'/layout/icon/file.png' },
+    { name: 'Range', type: 'range', icon:'/layout/icon/range.png' },
 ];
 
-export const listDivisi = [
-    {divisi:'-', name:'-'},
-    {divisi:'Logistic', name:'Logistic'},
-    {divisi:'Maintenance', name:'Maintenance'},
-    {divisi:'Tax', name:'Tax'},
-    {divisi:'Admin', name:'Admin'},
-    {divisi:'Finish Product Warehouse', name:'Finish Product Warehouse'},
-    {divisi:'Engineering', name:'Engineering'},
-    {divisi:'Internal Auditor', name:'Internal Auditor'},
-    {divisi:'Direktur Utama', name:'Direktur Utama'},
-    {divisi:'Risk Management', name:'Risk Management'},
-    {divisi:'Audit Management', name:'Audit Management'},
-    {divisi:'Supply Chain Management', name:'Supply Chain Management'},
-    {divisi:'HSSE', name:'HSSE'},
-    {divisi:'Innovation & Knowledge Management', name:'Innovation & Knowledge Management'},
-    {divisi:'Corporate Secretary', name:'Corporate Secretary'},
-    {divisi:'ICT', name:'ICT'},
-    {divisi:'Material Handling', name:'Material Handling'},
-    {divisi:'Laboratory', name:'Laboratory'},
-    {divisi:'PPIC', name:'PPIC'},
-    {divisi:'SEVP', name:'SEVP'},
-    {divisi:'Sales & Marketing Departement', name:'Sales & Marketing Departement'},
-    {divisi:'Controller & Tax', name:'Controller & Tax'},
-    {divisi:'Quality Assurance', name:'Quality Assurance'},
-    {divisi:'Quality Engineering & System', name:'Quality Engineering & System'},
-    {divisi:'Komisaris', name:'Komisaris'},
-    {divisi:'Finance & Risk Management', name:'Finance & Risk Management'},
-    {divisi:'Human Capital', name:'Human Capital'},
-    {divisi:'Operation Plant-I', name:'Operation Plant-I'},
-    {divisi:'Procurement', name:'Procurement'},
-    {divisi:'Sales & Marketing', name:'Sales & Marketing'},
-    {divisi:'Treasury & Budgeting', name:'Treasury & Budgeting'},
-    {divisi:'Sales Bulk', name:'Sales Bulk'},
-    {divisi:'Sales Retail', name:'Sales Retail'},
-    {divisi:'Channel Management', name:'Channel Management'},
-    {divisi:'Sourcing CPO', name:'Sourcing CPO'},
-    {divisi:'Quality, System & Knowledge Management', name:'Quality, System & Knowledge Management'},
-    {divisi:'AMGA', name:'AMGA'},
-    {divisi:'Corporate Development', name:'Corporate Development'},
-    {divisi:'Production', name:'Production'},
+// Menu Pertanyaan
+export const settingPertanyaan = [
+    {
+        label: 'Options',
+        items: [
+            {
+                label: 'Update',
+                icon: 'pi pi-refresh',
+                command: () => {
+                    toast.add({ severity: 'success', summary: 'Updated', detail: 'Data Updated', life: 3000 });
+                }
+            },
+            {
+                label: 'Delete',
+                icon: 'pi pi-times',
+                command: () => {
+                    toast.add({ severity: 'warn', summary: 'Delete', detail: 'Data Deleted', life: 3000 });
+                }
+            }
+        ]
+    },
+    {
+        label: 'Navigate',
+        items: [
+            {
+                label: 'Vue Website',
+                icon: 'pi pi-external-link',
+                url: 'https://vuejs.org/'
+            },
+            {
+                label: 'Router',
+                icon: 'pi pi-upload',
+                to: '/fileupload'
+            }
+        ]
+    }
 ];
 
-export const listKantor = [
-    {office:'-', name:'-'},
-    {office:'RO Medan', name:'RO Medan'},
-    {office:'Head Office / Sei Mangkei', name:'Head Office / Sei Mangkei'},
-    {office:'Pelabuhan Kuala Tanjung', name:'Pelabuhan Kuala Tanjung'},
-];
 
-export const listStatusKaryawan = [
-    {status_karyawan:'-', name:'-'},
-    {status_karyawan:'Karyawan Tetap', name:'Karyawan Tetap'},
-    {status_karyawan:'Karyawan PKWT', name:'Karyawan PKWT'},
-    {status_karyawan:'Karyawan Outsourching', name:'Karyawan Outsourching'},
-];
+// Breadcrumb Variable
+export const BreadcrumbHome =  { icon: 'pi pi-home', to: '/home' };
 
-export const formUser = {
-    id:0,
-    nik:'',
-    name:'',
-    email:'',
-    // Lahir                
-    tgl_lahir:'',                
-    prov_lahir:'',                
-    kabkot_lahir:'',                
-    kelamin:'',                
-    statuskawin:'',                
-    noHP:'',                
-    pendidikan:'',                
-    jurusan:'',                
-    agama:'',                
-    domisili:'', 
-
-    // Alamat KTP                
-    prov_ktp:'',                
-    kabkot_ktp:'',                
-    kec_ktp:'',                
-    kel_ktp:'',                
-    alamat_ktp:'',   
-
-    // Alamat Domisili                
-    prov_domisili:'',                
-    kabkot_domisili:'',                
-    kec_domisili:'',                
-    kel_domisili:'',                
-    alamat_domisili:'',   
-
-    // Data Pekerjaan                
-    nrk:'',                
-    npwp:'',                
-    jabatan:'',                
-    divisi:'',                
-    departemen:'',                
-    job_level:'',                
-    tanggungan:'',                
-    training:'',                
-    office:'',                
-    status:'',                
-    tgl_masuk:'',                
-    tgl_sampai:'',   
-    masa_kerja:'1 thn',
-
-    // Fasilitas Pekerjaan                
-    bpjs_kesehatan:'',                
-    bpjs_ketenagakerjaan:'',                
-    norek:'',                
-    rek:'',                
-    faskes1:'',                
-    gaji:'',                
-    tunjangan_t:'',                
-    tunjangan_tt:'',                
-    keterangan:'',
+// Variable default Forms
+export const formSurvey = {
+    id: 0,
+    desc: '',
+    title: '',
+    from: '',
+    to: '',
 }
+export const formUser = {
+    id: 0,
+    name: '',
+    email: '',
+}
+export const formCategory = {
+    id: 0,
+    name: '',
+}
+export const formQuestion = {
+    id: 0,
+    category_id: '',
+    question: '',
+    type: '',
+    require: '',
+    value:[],
+    desc:[],
+    extra:[],
+}
+
+
+// Data Bodong
+export const listKategori = [
+    {id:1, name:'Kategori 1'},
+    {id:2, name:'Kategori 2'},
+    {id:3, name:'Kategori 3'},
+]
+export const listuser = [
+    {id:1, name:'CV Dimas Love You', email:'marketing@dly.co.id'},
+    {id:2, name:'CV Dimas Karya', email:'marketing@cdk.co.id'},
+    {id:3, name:'PT Mencari Cinta Dimas', email:'marketing@mcd.co.id'},
+]
+export const listSurvey = [
+    {id:1, title:'Perkembangan Skill DCD', desc:'Dimas sedang diuji para pakar peneliti UNESCO terkait kemampuan bertanyanya.', from: date_ago, to: date_now, status:true},
+    {id:2, title:'Hasil Skill Dimas', desc:'Hasil pengujian skill Dimas terhadap UNESCO, Erdogan ketar-ketir', from: date_ago, to: date_now, status:false},
+    {id:3, title:'Dimas pembawa perdamaian dunia', desc:'Elite global ketar-ketir melihat skill Dimas', from: date_ago, to: date_now, status:true},
+]
+
+export const FormPreview = [
+    {
+        id:1,
+        chapter:'Tingkat Kepentingan',
+        categories:[
+            {
+                category_id:1,
+                category:'Misi Dunia',
+                survey:[
+                    {
+                        id:1,
+                        pertanyaan:'Apa yang terjadi jika DMS tidak ada di muka bumi ini?',
+                        type: 'text',
+                        require:1,
+                        jawaban: ''
+                    },
+                    {
+                        id:2,
+                        pertanyaan:'Apa saja yg di berbuat DMS untuk membawa perdamaian dunia?',
+                        type: 'option',
+                        require:0,
+                        jawaban: [
+                            {desc:'Menyelamatkan bumi dari kiamat sugra', value: 1},
+                            {desc:'Menghancurkan dunia dan seisinya', value: 2},
+                        ]
+                    },
+                ],
+            },
+            {
+                category_id:2,
+                category:'Visi Dunia',
+                survey:[
+                    {
+                        id:3,
+                        pertanyaan:'Mengapa DMS harus ada di bumi ini?',
+                        type: 'text',
+                        require:1,
+                        jawaban: ''
+                    },
+                    {
+                        id:4,
+                        pertanyaan:'Bagaimana cara DMS bisa menyelamatkan dunia dari perang dunia?',
+                        type: 'option',
+                        require:1,
+                        jawaban: [
+                            {desc:'Kentut berjama`ah', value: 1},
+                            {desc:'Bertanya kepada ahlinya dan melempar tanggung jawabnya ke oranglain', value: 2},
+                            {desc:'Akhlak BUMN', value: 3},
+                        ]
+                    },
+                ],
+            },
+        ]
+    },
+    {
+        id:2,
+        chapter:'Tingkat Kepuasan thd. Supplier Lain Sejenis',
+        categories:[
+            {
+                category_id:1,
+                category:'Misi Dunia',
+                survey:[
+                    {
+                        id:1,
+                        pertanyaan:'Apa yang terjadi jika DMS tidak ada di muka bumi ini?',
+                        type: 'text',
+                        require:1,
+                        jawaban: ''
+                    },
+                    {
+                        id:2,
+                        pertanyaan:'Apa saja yg di berbuat DMS untuk membawa perdamaian dunia?',
+                        type: 'option',
+                        require:0,
+                        jawaban: [
+                            {desc:'Menyelamatkan bumi dari kiamat sugra', value: 1},
+                            {desc:'Menghancurkan dunia dan seisinya', value: 2},
+                        ]
+                    },
+                ],
+            },
+            {
+                category_id:2,
+                category:'Visi Dunia',
+                survey:[
+                    {
+                        id:3,
+                        pertanyaan:'Mengapa DMS harus ada di bumi ini?',
+                        type: 'text',
+                        require:1,
+                        jawaban: ''
+                    },
+                    {
+                        id:4,
+                        pertanyaan:'Bagaimana cara DMS bisa menyelamatkan dunia dari perang dunia?',
+                        type: 'option',
+                        require:1,
+                        jawaban: [
+                            {desc:'Kentut berjama`ah', value: 1},
+                            {desc:'Bertanya kepada ahlinya dan melempar tanggung jawabnya ke oranglain', value: 2},
+                            {desc:'Akhlak BUMN', value: 3},
+                        ]
+                    },
+                ],
+            },
+        ]
+    },
+]
