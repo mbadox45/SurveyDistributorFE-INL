@@ -72,7 +72,8 @@ const tokenChecker = () => {
                 // Token has expired, remove it from localStorage
                 localStorage.removeItem('usertoken');
                 localStorage.removeItem('payload');
-                window.location.replace("http://localhost:5173/auth/login");
+                localStorage.removeItem('roles');
+                window.location.replace("http://192.168.1.223:8085/auth/login");
                 // router.push('/auth/login');
                 console.log('expired');
             } else {
