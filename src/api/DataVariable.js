@@ -26,10 +26,10 @@ export const listCategory = [
     { name: 'Kategori 3', category_id: 3 },
 ];
 export const typeAnswer = [
-    { name: 'Text', type: 'text', icon:'/layout/icon/textinput.png' },
+    { name: 'Text (Type: Text)', type: 'text', icon:'/layout/icon/textinput.png' },
+    { name: 'Text (Type: Number)', type: 'number', icon:'/layout/icon/number.png' },
     { name: 'Checkbox', type: 'checkbox', icon:'/layout/icon/checkbox.png' },
     { name: 'Radio', type: 'radio', icon:'/layout/icon/radio.png' },
-    { name: 'Number', type: 'number', icon:'/layout/icon/number.png' },
     { name: 'Dropdown', type: 'dropdown', icon:'/layout/icon/dropdown.png' },
     { name: 'File', type: 'file', icon:'/layout/icon/file.png' },
     { name: 'Range', type: 'range', icon:'/layout/icon/range.png' },
@@ -84,6 +84,9 @@ export const formSurvey = {
     title: '',
     from: '',
     to: '',
+    order_sp:[],
+    value:[],
+    question_order:'',
 }
 export const formUser = {
     id: 0,
@@ -96,10 +99,10 @@ export const formCategory = {
 }
 export const formQuestion = {
     id: 0,
-    category_id: '',
-    question: '',
-    type: '',
-    require: '',
+    category_id: 0,
+    question: null,
+    type: null,
+    require: null,
     value:[],
     desc:[],
     extra:[],

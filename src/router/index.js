@@ -10,12 +10,43 @@ const router = createRouter({
             component: AppLayout,
             redirect:'/home',
             children: [
+                // Distributor
+                {
+                    path: '/beranda',
+                    name: 'beranda',
+                    component: () => import('@/views/survey/distributor/Home/Index.vue'),
+                    meta:{
+                        requiresAuth: true,
+                        distributor:true,
+                    }
+                },
+                {
+                    path: '/survey-user',
+                    name: 'survey-user',
+                    component: () => import('@/views/survey/distributor/Survey/Index.vue'),
+                    meta:{
+                        requiresAuth: true,
+                        distributor:true,
+                    }
+                },
+                {
+                    path: '/update-password',
+                    name: 'update-password',
+                    component: () => import('@/views/survey/distributor/Profile/Index.vue'),
+                    meta:{
+                        requiresAuth: true,
+                        distributor:true,
+                    }
+                },
+
+                // Administrator
                 {
                     path: '/home',
                     name: 'home',
                     component: () => import('@/views/survey/administrator/pages/Home.vue'),
                     meta:{
                         requiresAuth: true,
+                        admin:true,
                     }
                 },
                 {
@@ -24,6 +55,7 @@ const router = createRouter({
                     component: () => import('@/views/survey/administrator/pages/Users.vue'),
                     meta:{
                         requiresAuth: true,
+                        admin:true,
                     }
                 },
                 {
@@ -32,6 +64,7 @@ const router = createRouter({
                     component: () => import('@/views/survey/administrator/pages/Categories.vue'),
                     meta:{
                         requiresAuth: true,
+                        admin:true,
                     }
                 },
                 {
@@ -40,14 +73,16 @@ const router = createRouter({
                     component: () => import('@/views/survey/administrator/pages/Questions.vue'),
                     meta:{
                         requiresAuth: true,
+                        admin:true,
                     }
                 },
                 {
                     path: '/survey',
                     name: 'survey',
-                    component: () => import('@/views/survey/administrator/pages/Survey.vue'),
+                    component: () => import('@/views/survey/administrator/pages/Surveys/Index.vue'),
                     meta:{
                         requiresAuth: true,
+                        admin:true,
                     }
                 },
                 {
@@ -56,9 +91,47 @@ const router = createRouter({
                     component: () => import('@/views/survey/administrator/pages/EditQuestion.vue'),
                     meta:{
                         requiresAuth: true,
+                        admin:true,
+                    }
+                },
+                {
+                    path: '/form-question/:cond',
+                    name: 'form-question',
+                    component: () => import('@/views/survey/administrator/pages/Question/Components/FormQuestions.vue'),
+                    meta:{
+                        requiresAuth: true,
+                        admin:true,
+                    }
+                },
+                {
+                    path: '/form-survey/:cond',
+                    name: 'form-survey',
+                    component: () => import('@/views/survey/administrator/pages/Surveys/Components/FormSurvey.vue'),
+                    meta:{
+                        requiresAuth: true,
+                        admin:true,
+                    }
+                },
+                {
+                    path: '/response-survey/:id',
+                    name: 'response-survey',
+                    component: () => import('@/views/survey/administrator/pages/Surveys/Components/ResponseSurvey.vue'),
+                    meta:{
+                        requiresAuth: true,
+                        admin:true,
                     }
                 },
             ]
+        },
+        {
+            path: '/sign-out',
+            name: 'signout',
+            component: () => import('@/views/survey/administrator/sign/SignOut.vue'),
+            meta:{
+                requiresAuth: true,
+                distributor:true,
+                // admin:true,
+            }
         },
         {
             path: '/auth/login',
@@ -91,16 +164,34 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
     const tokens = localStorage.getItem('usertoken') != null;
+    const roles = localStorage.getItem('roles');
+    // console.log(roles);
 
     if (to.matched.some((route) => route.meta.requiresAuth)) {
         if (tokens) {
-            next();
+            if (roles == 'admin') {
+                if (to.matched.some((route) => route.meta.admin)) {
+                    next();
+                } else {
+                    next('/home');
+                }
+            } else {
+                if (to.matched.some((route) => route.meta.distributor)) {
+                    next();
+                } else {
+                    next('/beranda');
+                }
+            }
         } else {
             next('/auth/login');
         }
     } else if (to.matched.some((route) => route.meta.guestOnly)) {
         if (tokens) {
-            next('/home');
+            if (roles == 'admin') {
+                next('/home');
+            } else {
+                next('/beranda');
+            }
         } else {
             next();
         }

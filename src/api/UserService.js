@@ -17,7 +17,10 @@ export default new class UserService{
     addUser(data){
         return http.post(`user/add`, data);
     }
-    updateUser(id,data){
-        return http.post(`user/update/${id}`, data);
+    updateUser(data){
+        return http.post(`update-password/`, data);
+    }
+    logoutUser(){
+        return http.post(`logout`);
     }
 }

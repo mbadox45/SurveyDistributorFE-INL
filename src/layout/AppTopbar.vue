@@ -1,14 +1,23 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 
 const { layoutConfig, onMenuToggle } = useLayout();
+
+// API
+import UserService from '@/api/UserService';
 
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 const displayConfirmation = ref(false);
+const displayPassword = ref(false);
 const router = useRouter();
+const route = useRoute();
+const route_name = computed(() => route.name)
+const roles = localStorage.getItem('roles');
+const payload = JSON.parse(localStorage.getItem('payload'));
+const formUpdate = ref({name: payload.name, email: payload.email, password:'', c_password:''})
 
 onMounted(() => {
     bindOutsideClickListener();
@@ -22,13 +31,39 @@ const logoUrl = computed(() => {
     return `layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
 });
 
+const viewUpdate = () => {
+    displayPassword.value = true
+    formUpdate.value = {name: payload.name, email: payload.email, password:'', c_password:''}
+    console.log(payload);
+};
+
 const onTopBarMenuButton = () => {
     topbarMenuActive.value = !topbarMenuActive.value;
 };
 const onSettingsClick = () => {
-    localStorage.removeItem('usertoken');
-    localStorage.removeItem('payload');
-    window.close();
+    // const roles = localStorage.getItem('roles');
+    if (roles == 'distributor') {
+        try {
+            const resp = UserService.logoutUser();
+            const load = resp.data;
+            if (load.code == 200) {
+                localStorage.removeItem('usertoken');
+                localStorage.removeItem('payload');
+                localStorage.removeItem('roles');
+                router.push('/auth/login');
+            }
+        } catch (error) {
+            localStorage.removeItem('usertoken');
+            localStorage.removeItem('payload');
+            localStorage.removeItem('roles');
+            router.push('/auth/login');
+        }
+    } else {
+        localStorage.removeItem('usertoken');
+        localStorage.removeItem('payload');
+        localStorage.removeItem('roles');
+        window.close();
+    }
 };
 const topbarMenuClasses = computed(() => {
     return {
@@ -80,18 +115,12 @@ const isOutsideClicked = (event) => {
         <router-link to="/" class="layout-topbar-logo justify-content-center">
             <!-- <img src="/layout/inl.png" alt="PT Industri Nabati Lestari" /> -->
             <!-- <img :src="logoUrl" alt="logo" /> -->
-            <span class="ml-2 text-cyan-800">SURVEY DISTRIBUTOR</span>
+            <span class="ml-2 text-cyan-800">SURVEY - INL</span>
         </router-link>
 
         <button class="p-link layout-menu-button layout-topbar-button text-cyan-800" @click="onMenuToggle()">
             <i class="pi pi-bars"></i>
         </button>
-        <!-- <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
-            <i class="pi pi-bars"></i>
-        </button>
-        <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
-            <i class="pi pi-bars"></i>
-        </button> -->
 
         <button class="p-link layout-topbar-menu-button layout-topbar-button text-cyan-800" @click="onTopBarMenuButton()">
             <i class="pi pi-ellipsis-v"></i>
@@ -101,8 +130,8 @@ const isOutsideClicked = (event) => {
             <!-- <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
                 <i class="pi pi-calendar"></i>
                 <span>Calendar</span>
-            </button>
-            <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
+            </button> -->
+            <!-- <button :class="`p-link layout-topbar-button text-cyan-800`" v-show="roles != 'admin'" @click="viewUpdate">
                 <i class="pi pi-user"></i>
                 <span>Profile</span>
             </button> -->

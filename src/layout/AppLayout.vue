@@ -62,22 +62,27 @@ const isOutsideClicked = (event) => {
 
 const tokenChecker = () => {
     const token = localStorage.getItem('usertoken');
+    const roles = localStorage.getItem('roles');
+    if (roles != 'distributor') {
+        if (token) {
+            const tokenData = parseJwt(token);
+            const expirationTime = tokenData.exp * 1000; // Convert expiration time to milliseconds
     
-    if (token) {
-        const tokenData = parseJwt(token);
-        const expirationTime = tokenData.exp * 1000; // Convert expiration time to milliseconds
-
-        if (Date.now() > expirationTime) {
-            // Token has expired, remove it from localStorage
-            localStorage.removeItem('usertoken');
-            localStorage.removeItem('payload');
-            window.location.replace("http://localhost:5173/auth/login");
-            // router.push('/auth/login');
-            console.log('expired');
-        } else {
-            console.log('Token activated');
-            // config.headers['Authorization'] = `Bearer ${token}`;
+            if (Date.now() > expirationTime) {
+                // Token has expired, remove it from localStorage
+                localStorage.removeItem('usertoken');
+                localStorage.removeItem('payload');
+                window.location.replace("http://localhost:5173/auth/login");
+                // router.push('/auth/login');
+                console.log('expired');
+            } else {
+                console.log('Token activated');
+                console.log(token);
+                // config.headers['Authorization'] = `Bearer ${token}`;
+            }
         }
+    } else {
+        console.log(token);
     }
 }
 
@@ -89,6 +94,29 @@ const parseJwt = (token) => {
     }).join(''));
 
     return JSON.parse(jsonPayload);
+
+// ============================================================================
+    // const base64Url = btoa(token); // Encode the token using Base64 URL-safe encoding
+    // const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    // const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+    //     return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    // }).join(''));
+
+    // return JSON.parse(jsonPayload);
+
+// ============================================================================
+    // // Convert the URL-safe Base64 to standard Base64
+    // const base64Url = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    // // Add padding if necessary
+    // const padding = base64Url.length % 4 === 2 ? '==' : base64Url.length % 4 === 1 ? '=' : '';
+    // const base64 = base64Url + padding;
+
+    // // Decode and parse JSON payload
+    // const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+    //     return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    // }).join(''));
+
+    // return JSON.parse(jsonPayload);
 }
 </script>
 

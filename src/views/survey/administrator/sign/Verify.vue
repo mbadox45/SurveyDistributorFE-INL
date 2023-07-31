@@ -16,6 +16,8 @@ onMounted(() => {
 
 const loadParams = () => {
     const token = route.query.token;
+    // const id_user = route.params.id;
+    // console.log(id_user,token)
     if (token == null || token == '') {
         setTimeout(function() {
             window.close();
@@ -44,13 +46,17 @@ const loadParams = () => {
                 VerifyService.getUser(idUser.value,header).then(res => {
                     const load = res.data;
                     const data = load.data;
+                    const roles = "admin";
                     const pushdata = {
                         id :  idUser.value,
                         email : data.email,
                         name : data.name,
+                        type: "admin",
                     }
+                    localStorage.setItem('roles', roles);
                     localStorage.setItem('usertoken', token);
                     localStorage.setItem('payload', JSON.stringify(pushdata));
+                    console.log(data);
                 })
                 setTimeout(function() {
                     loadings.value = false;

@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router';
 
 // API
 import {formSurvey, listSurvey} from '@/api/DataVariable';
+import SurveyService from '@/api/SurveyService';
 
 
 // Variable
@@ -22,6 +23,7 @@ const forms = ref(formSurvey);
 const date = new Date();
 const statusdialog = ref(null);
 const list_Survey = ref([]);
+const loadings = ref(true)
 
 const payload = JSON.parse(localStorage.getItem('payload'));
 const breadcrumbHome = ref({ icon: 'pi pi-home', to: '/home' });
@@ -39,29 +41,47 @@ const onCheck = (id) => {
     console.log(checked.value[id]);
 }
 
-const editQuestion = (id, title, desc) => {
-    router.push(`/edit-question/${id}?title=${title}&desc=${desc}`);
+const linked = (cond, id) => {
+    if (cond == 'add') {
+        router.push(`/form-survey/${cond}`);
+    } else {
+        router.push(`/form-survey/${cond}?id=${id}`);
+    }
 }
 
-const previewQuestion = (id, title, desc) => {
-    console.log(router.push({path:`/form/preview/${id}`, query:{title: title, desc:desc}, target: '_blank'}))
+const previewQuestion = (id, path) => {
+    console.log(router.push({path:`${path}${id}`, target: '_blank'}))
     // router.push({path:`/form/preview/${id}`, query:{title: title, desc:desc}, target: '_blank'});
 }
 
 const loadSurvey = () => {
-    const list = []
-    for (let i = 0; i < listSurvey.length; i++) {
-        list[i] = {
-            id: listSurvey[i].id,
-            title: listSurvey[i].title,
-            desc: listSurvey[i].desc,
-            from: listSurvey[i].from,
-            to: listSurvey[i].to,
-            status: listSurvey[i].status,
-        };
-        // checked.value[id]
-    }
-    list_Survey.value = list;
+    SurveyService.getSurvey().then(res => {
+        const load = res.data;
+        if (load.code == 200) {
+            const data = load.data;
+            const list = [];
+            for (let i = 0; i < data.length; i++) {
+                list[i] = {
+                    id: data[i].id,
+                    title: data[i].title.toUpperCase(),
+                    desc: data[i].desc,
+                    from: data[i].from,
+                    to: data[i].to,
+                    status: data[i].status,
+                }
+            }
+            list_Survey.value = list;
+            loadings.value = false;
+        } else {
+            list_Survey.value = [];
+            loadings.value = false;
+        }
+    })
+    .catch(error => {
+        list_Survey.value = [];
+        loadings.value = false;
+        console.error(error.response.status);
+    })
 }
 
 const filteredList = computed(() => {
@@ -148,10 +168,10 @@ const postDialog = () => {
                         <h5>List Survey</h5>
                     </div>
                     <div class="col-6 md:col-6 sm:col-6 text-right">
-                        <Button severity="info" size="small" icon="pi pi-plus" outlined label="Add Survey" @click="showDialog('add','')" />
+                        <Button severity="info" size="small" icon="pi pi-plus" outlined label="Add Survey" @click="linked('add','')" />
                     </div>
                 </div>
-                <DataView :value="filteredList" :layout="layout" :paginator="true" :rows="9" :sortOrder="sortOrder" :sortField="sortField" >
+                <DataView :value="filteredList" :layout="layout" :paginator="true" :rows="9" :sortOrder="sortOrder" :sortField="sortField" v-if="list_Survey.length > 0">
                     <template #header>
                         <div class="grid grid-nogutter">
                             <div class="col-12 text-left">
@@ -168,7 +188,7 @@ const postDialog = () => {
                                     <div class="mb-3">{{ slotProps.data.desc }}</div>
                                     <Chip class="pl-0 pr-3 mb-2 cursor-pointer">
                                         <span class="border-circle w-2rem h-2rem flex align-items-center justify-content-center" :class="slotProps.data.status == true ? 'bg-primary' : 'bg-red-500 text-white'"><i class="pi pi-check" v-if="slotProps.data.status == true"></i><i class="pi pi-times" v-else></i></span>
-                                        <span class="ml-2 font-medium">{{slotProps.data.status == true ? 'Active' : 'Non Active'}}</span>
+                                        <span class="ml-2 font-medium">{{slotProps.data.status == "1" ? 'Active' : 'Non Active'}}</span>
                                     </Chip>
                                     <!-- <Rating :modelValue="slotProps.data.rating" :readonly="true" :cancel="false" class="mb-2"></Rating> -->
                                     <div class="flex align-items-center">
@@ -177,38 +197,24 @@ const postDialog = () => {
                                     </div>
                                 </div>
                                 <div class="flex flex-row md:flex-column justify-content-between w-full md:w-auto align-items-center md:align-items-end mt-5 md:mt-0">
-                                    <Button icon="pi pi-check" v-tooltip.left="'Edit Survey'" class="mb-2" severity="secondary" size="small" rounded></Button>
-                                    <Button icon="pi pi-question" class="mb-2" v-tooltip.left="'Edit Pertanyaan'" severity="warning" size="small" rounded @click="editQuestion(slotProps.data.id, slotProps.data.title, slotProps.data.desc)"></Button>
-                                    <Button icon="pi pi-eye" class="mb-2" v-tooltip.left="'Preview'" severity="success" size="small" rounded @click="previewQuestion(slotProps.data.id, slotProps.data.title, slotProps.data.desc)"></Button>
+                                    <Button icon="pi pi-pencil" v-tooltip.left="'Edit Survey'" class="mb-2" severity="warning" size="small" rounded @click="linked('edit',slotProps.data.id)"></Button>
+                                    <Button icon="pi pi-external-link" class="mb-2" v-tooltip.left="'Preview'" severity="success" size="small" rounded @click="previewQuestion(slotProps.data.id, '/form/preview/')"></Button>
+                                    <Button icon="pi pi-percentage" class="mb-2" v-tooltip.left="'Respon'" severity="primary" size="small" rounded @click="previewQuestion(slotProps.data.id, '/response-survey/')"></Button>
                                     <!-- <span :class="'product-badge status-' + slotProps.data.inventoryStatus.toLowerCase()">{{ slotProps.data.inventoryStatus }}</span> -->
                                 </div>
                             </div>
                         </div>
                     </template>
-
-                    <template #grid="slotProps">
-                        <div class="col-12 md:col-4">
-                            <div class="card m-3 border-1 surface-border">
-                                <div class="flex align-items-center justify-content-between">
-                                    <div class="flex align-items-center">
-                                        <i class="pi pi-tag mr-2"></i>
-                                        <span class="font-semibold">{{ slotProps.data.category }}</span>
-                                    </div>
-                                </div>
-                                <div class="text-center">
-                                    <img :src="'/survey3.png'" :alt="slotProps.data.title" class="w-9 shadow-2 my-3 mx-0" />
-                                    <div class="text-2xl font-bold">{{ slotProps.data.title }}</div>
-                                    <div class="mb-3">{{ slotProps.data.desc }}</div>
-                                </div>
-                                <div class="flex align-items-center justify-content-between">
-                                    <Button icon="pi pi-check" label="Edit Survey" severity="secondary" size="small"></Button>
-                                    <Button icon="pi pi-pencil" label="Edit Question" severity="info" outlined size="small"></Button>
-                                    <Button icon="pi pi-eye" label="Preview" severity="success" size="small"></Button>
-                                </div>
-                            </div>
-                        </div>
-                    </template>
                 </DataView>
+                <div class="text-center mb-5 mt-2" v-else>
+                    <span class="text-lg">{{ loadings == true ? '' : 'Data not found' }} </span>
+                </div>
+                <div class="flex align-items-center justify-content-center mb-3" v-if="loadings == true">
+                    <div class="">
+                        <ProgressSpinner aria-label="Loading" style="width: 50px; height: 50px" />
+                    </div>
+                    <div class="text-gray-500 font-semibold">Please wait ...</div>
+                </div>
             </div>
         </div>
     </div>

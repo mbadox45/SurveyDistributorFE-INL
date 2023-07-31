@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const http = axios.create({
-    // baseURL:'http://36.92.181.10:4763/api/',
-    baseURL:'http://localhost:8000/api/',
+    baseURL:'http://36.92.181.10:4763/api/',
+    // baseURL:'http://localhost:8001/api/',
 })
 
 class VerifyService{

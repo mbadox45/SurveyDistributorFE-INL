@@ -1,68 +1,241 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute  } from 'vue-router';
+// import { useToast } from 'primevue/usetoast';
 
 // API
+import SurveyService from '@/api/SurveyService';
 import { FormPreview } from '@/api/DataVariable';
 
+// const toast = useToast();
 const router = useRouter();
 const route = useRoute();
 const time = ref(3000)
+
+const surveys = ref({from: '', to:'', title:'', desc:'', id:0});
+const pertanyaan = ref([]);
+const answare = ref([{id_pertanyaan:null, type:'',value:null}]);
+const selectedCategories = ref()
+const payload = JSON.parse(localStorage.getItem('payload'));
+const roles = localStorage.getItem('roles');
+
+// Kondisi form sudah di submit(true) jika belum (false)
+const finished = ref(false);
 
 const listPertanyaan = ref(FormPreview)
 
 const params = route.params.id;
 const judul = route.query.title;
-// const judul = 'Tomy Sayang Dimas';
 const deskipsi = route.query.desc;
 
 onMounted(() => {
-    // loadParams()
+    loadSurvey()
 });
+
+const loadSurvey = () => {
+    SurveyService.getSurveyID(params).then(res => {
+        const load = res.data;
+        if (load.code == 200) {
+            const data = load.survey;
+            surveys.value = {
+                from: data.from,
+                to: data.to,
+                desc: data.desc,
+                title: data.title,
+                id: data.id,
+            }
+            const sp = data.survey_pertanyaans
+            for (let i = 0; i < sp.length; i++) {
+                const question = sp[i].questions;
+                const questions = [];
+
+                // Proses penambahan v-model yaitu "model" sebagai media input komponen form
+                for (let a = 0; a < question.length; a++) {
+                    let model;
+                    if (question[a].type == 'checkbox') {
+                        model = [];
+                    } else if (question[a].type == 'number') {
+                        model = 0;
+                    } else {
+                        model = '';
+                    }
+                    questions[a] = {
+                        category_id: question[a].category_id,
+                        question: question[a].question,
+                        require: question[a].require,
+                        status: question[a].status,
+                        type: question[a].type,
+                        id: question[a].id,
+                        options: question[a].options,
+                        pivot: question[a].pivot,
+                        model: model,
+                    }
+                }
+                pertanyaan.value[i] = {
+                    id: sp[i].id,
+                    value: sp[i].value,
+                    question: questions,
+                }
+            }
+            console.log(pertanyaan.value);
+            console.log(sp);
+        } else {
+            surveys.value = {from: '', to:'', title:'', desc:'', id:0}
+        }
+    })
+}
+
+const submitForm = async () => {
+    console.log(pertanyaan.value);
+    const pertanyaans = pertanyaan.value;
+    let answare = '{"answer": {';
+    for (let i = 0; i < pertanyaans.length; i++) {
+        answare += `"sp-${pertanyaans[i].id}":{`;
+        const question = pertanyaans[i].question;
+        answare += '"jawaban":"'
+        let jawaban = '';
+        for (let a = 0; a < question.length; a++) {
+            // Jawaban string
+            jawaban += question[a].id+'|';
+            if (question[a].type == 'checkbox') {
+                const model = question[a].model;
+                for (let b = 0; b < model.length; b++) {
+                    jawaban += model[b]
+                    if (b < (model.length-1)) {
+                        jawaban +='~';
+                    }
+                }
+            } else {
+                jawaban += question[a].model
+            }
+            if (a < (question.length - 1)) {
+                jawaban += ';';
+            } else {
+                jawaban += '",';
+            }
+        }
+        // Extra string
+        jawaban += '"extra":';
+        let ext = '';
+        for (let a = 0; a < question.length; a++) {
+            const options = question[a].options;
+            for (let b = 0; b < options.length; b++) {
+                if (options[b].extra_answer != "0") {
+                    if (b == 0) {
+                        ext += '{'
+                    }
+                    ext += `"ext-${options[b].id}":"Test"`
+                }
+            }
+        }
+        if (ext == '') {
+            ext += 'null'
+        }
+        jawaban += ext
+        answare += jawaban;
+        if (i >= (pertanyaans.length - 1)) {
+            answare += '}';
+        } else {
+            answare += '},';
+        }
+    }
+    answare +='}}';
+    const postAnswer = JSON.parse(answare)
+
+    // toast.add({ severity: 'success', summary: 'Successfully', detail: `Filling in the survey data has been completed`, life: 3000 });
+    try {
+        const response = SurveyService.postAnswerSurvey(params, postAnswer);
+        const load = response.data;
+        console.log(load)
+        finished.value = true;
+    } catch (error) {
+        console.log(error.response.data)
+        finished.value = false;
+    }
+}
+
+const link = () => {
+    router.back();
+}
 
 </script>
 
 <template>
-    <div class="flex justify-content-center pb-4">
-        <div class="md:w-6">
-            <div class="grid my-3">
-                <div class="col-6 md:col-6 lg:col-6">
-                    <img src="/layout/inl.png" alt="PT. Industri Nabati Lestari" style="width: 80px;">
+    <div class="flex justify-content-center min-h-screen overflow-hidden pb-6 bg-no-repeat bg-cover" style="background-image: url('/layout/bg4.jpg');">
+        <!-- <Toast position="bottom-center"/> -->
+        <div class="grid w-full justify-content-center">
+            <div class="col-12 md:col-8 sm:col-8 bg-white mt-6 border-round-md" v-show="finished == false">
+                <div class="flex justify-content-between py-6 px-4 bg-no-repeat bg-cover border-round-md shadow-2" style="background-image: url('/layout/bg2.jpg');">
+                    <div class="">
+                        <div class="font-bold text-3xl md:text-3xl sm:text-xl mb-1 p-1 bg-cyan-50 border-round-md">{{surveys.title.toLocaleUpperCase()}}</div>
+                        <div class="text-gray-500 font-semibold text-md">{{surveys.desc}}</div>
+                    </div>
+                    <div class="">
+                        <img src="/layout/inl.png" alt="PT. Industri Nabati Lestari" class="mr-3 w-5rem">
+                        <img src="/layout/n3.png" alt="PT. Perkebunan Nusantara" class="w-5rem">
+                    </div>
                 </div>
-                <div class="col-6 md:col-6 lg:col-6 text-right">
-                    <img src="/layout/n3.png" alt="PT. Perkebunan Nusantara" style="width: 80px;">
-                </div>
-            </div>
-            <div class="card shadow-8 px-3 py-5 md:px-3 lg:px-6">
-                <div class="text-700">
-                    <Divider align="center" type="dashed">
-                        <div class="text-800 font-bold text-lg mb-1 text-center">PENGISIAN FORM SURVEY DISTRIBUTOR</div>
-                        <div class="text-400 font-semibold text-md mb-1 text-center">PT. Industri Nabati Lestari</div>
-                    </Divider>
-                    <Divider/>
-                    <div class="text-900 font-medium text-3xl lg:text-3xl sm:text-lg mb-1">{{judul.toLocaleUpperCase()}}</div>
-                    <div class="text-500 text-md mb-5">{{deskipsi}}</div>
-                </div>
-                <div v-for="list in listPertanyaan" :key="list.id" class="my-7 bg-red-50 p-2 rounded">
-                    <h4 class="text-red-500 text-2xl lg:text-2xl sm:text-md text-center p-2">{{ list.chapter.toUpperCase() }}</h4>
-                    <div v-for="kategori in list.categories" :key="kategori.category_id">
-                        <h4 class="bg-yellow-300 p-2">{{ kategori.category }}</h4>
-                        <div v-for="survey in kategori.survey" :key="survey.id" class="my-4">
-                            <p class="font-medium md:text-lg sm:text-xs text-600" style="font-family: Arial, Helvetica, sans-serif; word-wrap: break-word;">{{ survey.pertanyaan }} <span class="text-red-600 font-bold" v-show="survey.require==1">*</span> </p>
-                            <div v-show="survey.type == 'text'">
-                                <InputText placeholder="Jawaban: " class="w-full" />
+                <!-- <div class="">
+                    <h6 class="text-md"><i class="pi pi-user font-semibold mr-2"></i>{{ payload.name }}</h6>
+                    <span><i class="pi pi-envelope font-semibold mr-2"></i>{{ payload.email }}</span>
+                </div> -->
+                <Divider/>
+                <div class="card shadow-3" v-for="list in pertanyaan" :key="list.id">
+                    <div class="bg-yellow-200 p-1">
+                        <h4 class="text-cyan-700 text-2xl lg:text-2xl sm:text-md text-center">{{ list.value.toUpperCase() }}</h4>
+                    </div>
+                    <div v-for="question in list.question" :key="question.id" class="my-4">
+                        <span class="font-medium md:text-lg sm:text-xs" style="font-family: Arial, Helvetica, sans-serif; word-wrap: break-word;">{{ question.question }} <span class="text-red-600 font-bold" v-show="question.require==true">*</span> </span>
+                        <div v-show="question.type == 'checkbox'">
+                            <div v-for="options in question.options" :key="options.id" class="my-1 flex align-items-center">
+                                <Checkbox :value="options.id" v-model="question.model" />
+                                <label class="ml-2">{{ options.description }}</label>
                             </div>
-                            <div v-show="survey.type == 'option'">
-                                <div class="flex align-items-center my-2" v-for="jawaban in survey.jawaban" :key="jawaban.value">
-                                    <RadioButton inputId="ingredient1" name="pizza" :value="jawaban.value" />
-                                    <label for="ingredient1" class="ml-2">{{jawaban.desc}}</label>
-                                </div>
+                        </div>
+                        <div v-show="question.type == 'text'">
+                            <InputText id="text" type="text" class="w-full my-2" v-model="question.model"/>
+                        </div>
+                        <div v-show="question.type == 'radio'" class="my-1">
+                            <div v-for="options in question.options" :key="options.id" class="flex align-items-center">
+                                <RadioButton name="pizza" :value="options.id" v-model="question.model"/>
+                                <label class="ml-2">{{ options.description }}</label>
                             </div>
+                        </div>
+                        <div v-show="question.type == 'range'" class="my-2">
+                            <SelectButton :options="question.options" optionLabel="description" optionValue="id" v-model="question.model"/>
+                        </div>
+                        <div v-show="question.type == 'dropdown'">
+                            <Dropdown :options="question.options" optionLabel="description" optionValue="value" placeholder="Select a Answare" class="w-full" v-model="question.model"/>
+                        </div>
+                        <div v-show="question.type == 'number'">
+                            <InputNumber class="w-full my-2" v-model="question.model"/>
                         </div>
                     </div>
                 </div>
-                <div>
-                    <Button label="SUBMIT" severity="primary" size="small"></Button>
+                <div class="card shadow-3 bg-gray-300">
+                    <h6 class="text-xl"><i class="text-xl pi pi-user font-semibold mr-2"></i>{{ payload.name }}</h6>
+                    <span class="text-xl"><i class="text-xl pi pi-envelope font-semibold mr-2"></i>{{ payload.email }}</span>
+                </div>
+                <div class="flex justify-content-between">
+                    <Button label="BACK" severity="danger" icon="pi pi-arrow-left" size="small" @click="link"></Button>
+                    <Button label="SUBMIT" severity="primary" size="small" :disabled="roles == 'admin' ? true : false" @click="submitForm"></Button>
+                </div>
+            </div>
+            <div class="col-12 md:col-8 sm:col-8 bg-white mt-6 border-round-md" v-show="finished == true">
+                <div class="flex justify-content-between py-6 px-4 bg-no-repeat bg-cover border-round-md shadow-2 mb-8" style="background-image: url('/layout/bg2.jpg');">
+                    <div class="">
+                        <div class="text-3xl md:text-3xl sm:text-lg mb-1 p-1 bg-cyan-50 border-round-md"><span class="font-bold mr-2">{{ payload.name }}</span> <span class="font-thin">({{ payload.email }})</span></div>
+                        <div class="text-gray-600 text-md mt-2">By <strong>PT. Industri Nabati Lestari</strong></div>
+                    </div>
+                    <div class="">
+                        <img src="/layout/inl.png" alt="PT. Industri Nabati Lestari" class="mr-3 w-5rem">
+                        <img src="/layout/n3.png" alt="PT. Perkebunan Nusantara" class="w-5rem">
+                    </div>
+                </div>
+                <div class="mt-8 text-center">
+                    <h1 class="font-normal">Terimakasih telah mengisi data survey dari kami</h1>
+                    <h5 class="font-bold mb-6">{{surveys.title}}</h5>
+                    <Button label="Back to the list survey page" severity="warning" outlined size="small" @click="link"></Button>
                 </div>
             </div>
         </div>

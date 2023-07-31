@@ -14,7 +14,7 @@ export default defineConfig(() => {
         },
         server:{
         //     host:'192.168.0.182',
-            port:'8085'
+            port:'8086'
         }
     };
 });
