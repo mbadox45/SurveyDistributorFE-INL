@@ -31,6 +31,7 @@ const loadParams = () => {
             setTimeout(function() {
                 loadings.value = false;
                 window.location.replace("http://192.168.1.223:8085/auth/login");
+                // window.location.replace("http://localhost:5173/auth/login");
                 console.log('token expired')
             }, time.value);
         } else {
@@ -60,12 +61,15 @@ const loadParams = () => {
                 })
                 setTimeout(function() {
                     loadings.value = false;
-                    router.push('/home')
+                    // window.location.replace("http://localhost:5173/home");
+                    window.location.replace("http://192.168.1.223:8085/home");
+                    // router.push('/home')
                 }, time.value);
             } else {
                 setTimeout(function() {
                     loadings.value = false;
-                    router.push('/home')
+                    window.location.replace("http://192.168.1.223:8085/home");
+                    // router.push('/home')
                 }, time.value);
             }
         }
