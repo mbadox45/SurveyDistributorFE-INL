@@ -23,6 +23,7 @@ const deskipsi = ref(null);
 const forms = ref(formSurvey);
 const forms_chapter = ref([{order_sp:'', pertanyaan:['']}]);
 const forms_answare = ref([{order_sp:null}]);
+const survey_pertanyaan_ids = ref([]);
 const answers = ref(null);
 const tot_answare = ref(1);
 
@@ -66,21 +67,22 @@ const loadQuestion = () => {
         const load = res.data;
         if (load.code == 200) {
             const data = load.data;
-            console.log(data)
+            // console.log(data)
             const list = [];
             for (let i = 0; i < data.length; i++) {
-                const list2 = [];
-                const options = data[i].options;
-                for (let a = 0; a < options.length; a++) {
-                    list2[a] = options[a].id;
-                }
+                // const list2 = [];
+                // const options = data[i].options;
+                // for (let a = 0; a < options.length; a++) {
+                //     list2[a] = options[a].id;
+                // }
                 list[i] = {
                     order_sp:data[i].category_id,
                     name:data[i].question,
-                    value:data[i].category.name,
+                    value:data[i].id,
                     question_order:data[i].id,
                 }
             }
+            // console.log(list)
             listQuestion.value = list;
         } else {
             listQuestion.value = [];
@@ -88,18 +90,18 @@ const loadQuestion = () => {
     })
     .catch(error => {
         listQuestion.value = [];
-        console.error(error.response.status);
+        // console.error(error.response.status);
     })
 }
 
 const addForms = () => {
     if (params == 'edit') {
         SurveyService.getSurveyID(id_survey).then(res => {
+            setTimeout(loadQuestion, 1000);
             const load = res.data;
-            loadQuestion();
             if (load.code == 200) {
                 const data = load.survey;
-                console.log(data);
+                // console.log(data);
                 forms.value.id = data.id;
                 forms.value.title = data.title;
                 forms.value.desc = data.desc;
@@ -107,9 +109,11 @@ const addForms = () => {
                 forms.value.to = data.to;
                 const ans = data.survey_pertanyaans; 
                 const list = [];
+                const list2 = [];
                 for (let i = 0; i < ans.length; i++) {
                     const question = ans[i].questions;
                     // list[i].order_sp = ans[i].value
+                    list2[i] = ans[i].id;
                     const pertanyaan = [];
                     for (let a = 0; a < question.length; a++) {
                         // pertanyaan[a]= {
@@ -123,7 +127,8 @@ const addForms = () => {
                     }
                 }
                 forms_chapter.value = list;
-                console.log(list);
+                survey_pertanyaan_ids.value = list2;
+                console.log(ans);
             } else {
                 forms.value = {}
             }
@@ -184,47 +189,47 @@ const compareAndPush = (data) => {
 const postDialog = async () => {
     if (params == 'add') {
         const fa = forms_chapter.value;
-        console.log(fa);
-        // if (forms.value.title != '' && forms.value.desc != '' && forms.value.from != '' && forms.value.to != '' && fa[0].order_sp != '') {
-        //     const order_sp = [];
-        //     const value = [];
-        //     let question_order = '';
-        //     for (let i = 0; i < fa.length; i++) {
-        //         order_sp[i] = i+1;
-        //         value[i] = fa[i].order_sp;
-        //         const fap = fa[i].pertanyaan 
-        //         question_order += (i+1) + '|';
-        //         for (let a = 0; a < fap.length; a++) {
-        //             if (a >= (fap.length - 1) && i >= (fa.length - 1)) {
-        //                 question_order += fap[a];
-        //             } else if (a >= (fap.length - 1) && i < (fa.length - 1)) {
-        //                 question_order += fap[a] + ';';
-        //             } else {
-        //                 question_order += fap[a] + ',';
-        //             }
-        //         }
-        //     }
-        //     forms.value.order_sp = order_sp;
-        //     forms.value.value = value;
-        //     forms.value.question_order = question_order;
-        //     forms.value.from = moment(forms.value.from).format('YYYY-MM-DD');
-        //     forms.value.to = moment(forms.value.to).format('YYYY-MM-DD');
-        //     SurveyService.addSurvey(forms.value).then(res => {
-        //         const load = res.data;
-        //         if (load.code == 200) {
-        //             resetForm();
-        //             toast.add({ severity: 'success', summary: 'Successfully', detail: `Data saved successfully`, life: 3000 });
-        //             setTimeout(backToQuestion, 3000);
-        //         } else {
-        //             toast.add({ severity: 'warn', summary: 'Caution', detail: `Process failed`, life: 3000 });
-        //         }
-        //     }).catch(error => {
-        //         console.error(error.response.status);
-        //         toast.add({ severity: 'danger', summary: 'Attention', detail: 'Unable to post data', life: 3000 });
-        //     })
-        // } else {
-        //     toast.add({ severity: 'warn', summary: 'Caution', detail: `Harap diisi dengan lengkap`, life: 3000 });
-        // }
+        // console.log(fa);
+        if (forms.value.title != '' && forms.value.desc != '' && forms.value.from != '' && forms.value.to != '' && fa[0].order_sp != '') {
+            const order_sp = [];
+            const value = [];
+            let question_order = '';
+            for (let i = 0; i < fa.length; i++) {
+                order_sp[i] = i+1;
+                value[i] = fa[i].order_sp;
+                const fap = fa[i].pertanyaan 
+                question_order += (i+1) + '|';
+                for (let a = 0; a < fap.length; a++) {
+                    if (a >= (fap.length - 1) && i >= (fa.length - 1)) {
+                        question_order += fap[a];
+                    } else if (a >= (fap.length - 1) && i < (fa.length - 1)) {
+                        question_order += fap[a] + ';';
+                    } else {
+                        question_order += fap[a] + ',';
+                    }
+                }
+            }
+            forms.value.order_sp = order_sp;
+            forms.value.value = value;
+            forms.value.question_order = question_order;
+            forms.value.from = moment(forms.value.from).format('YYYY-MM-DD');
+            forms.value.to = moment(forms.value.to).format('YYYY-MM-DD');
+            SurveyService.addSurvey(forms.value).then(res => {
+                const load = res.data;
+                if (load.code == 200) {
+                    resetForm();
+                    toast.add({ severity: 'success', summary: 'Successfully', detail: `Data saved successfully`, life: 3000 });
+                    setTimeout(backToQuestion, 3000);
+                } else {
+                    toast.add({ severity: 'warn', summary: 'Caution', detail: `Process failed`, life: 3000 });
+                }
+            }).catch(error => {
+                console.error(error.response.status);
+                toast.add({ severity: 'danger', summary: 'Attention', detail: 'Unable to post data', life: 3000 });
+            })
+        } else {
+            toast.add({ severity: 'warn', summary: 'Caution', detail: `Harap diisi dengan lengkap`, life: 3000 });
+        }
     } else {
         const fa = forms_chapter.value;
         if (forms.value.title != '' && forms.value.desc != '' && forms.value.from != '' && forms.value.to != '' && fa[0].order_sp != '') {
@@ -232,13 +237,14 @@ const postDialog = async () => {
             const order_sp = [];
             const value = [];
             const question_order = [];
+            // const survey_pertanyaan_id = [];
             for (let i = 0; i < fa.length; i++) {
                 order_sp[i] = i+1;
                 value[i] = fa[i].order_sp;
                 const fap = fa[i].pertanyaan 
                 let qo = (i+1) + '|';
                 for (let a = 0; a < fap.length; a++) {
-                    if (a >= (fap.length - 1) && i >= (fa.length - 1)) {
+                    if (a >= (fap.length - 1)) {
                         qo += fap[a];
                     }  else {
                         qo += fap[a] + ',';
@@ -246,8 +252,21 @@ const postDialog = async () => {
                 }
                 question_order[i] = qo;
             }
-            console.log(order_sp,value,question_order);
-            toast.add({ severity: 'success', summary: 'Successfully', detail: `Data saved successfully`, life: 3000 });
+            console.log({order_sp:order_sp,value:value,question_order:question_order});
+            forms.value.from = moment(forms.value.from).format('YYYY-MM-DD');
+            forms.value.to = moment(forms.value.to).format('YYYY-MM-DD');
+            forms.value.order_sp = order_sp;
+            forms.value.value = value;
+            forms.value.question_order = question_order;
+            forms.value.survey_pertanyaan_id = survey_pertanyaan_ids;
+            try {
+                const response = SurveyService.updateSurvey(forms.value.id, forms.value);
+                console.log(response);
+                toast.add({ severity: 'success', summary: 'Successfully', detail: `Data saved successfully`, life: 3000 });
+                setTimeout(backToQuestion, 3000);
+            } catch (error) {
+                toast.add({ severity: 'danger', summary: 'Attention', detail: `Unable to post data`, life: 3000 });
+            }
         } else {
             toast.add({ severity: 'warn', summary: 'Caution', detail: `Harap diisi dengan lengkap`, life: 3000 });
         }

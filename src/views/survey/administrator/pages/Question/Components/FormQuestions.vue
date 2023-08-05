@@ -169,7 +169,7 @@ const addsFormRange = () => {
         for (let i = 0; i < 5; i++) {
             list[i] = {
                 option_id: null,
-                value: '',
+                value: i+1,
                 extra: false,
                 desc: '',
             }
@@ -246,9 +246,7 @@ const postDialog = () => {
     forms.value.extra = extra;
 
     if (params == 'add') {
-        if (forms.value.question != null && forms.value.type != null && forms.value.require != null && forms_answare.value[0].value != '' && forms_answare.value[0].desc != null) {
-            console.log(forms_answare.value);
-            console.log(forms.value);
+        if (forms.value.type == 'text' || forms.value.type == 'number') {
             QuestionService.addQuestion(forms.value).then(res => {
                 const load = res.data;
                 if (load.code == 200) {
@@ -263,7 +261,25 @@ const postDialog = () => {
                 toast.add({ severity: 'danger', summary: 'Attention', detail: 'Unable to post data', life: 3000 });
             })
         } else {
-            toast.add({ severity: 'warn', summary: 'Caution', detail: `Harap diisi dengan lengkap`, life: 3000 });
+            if (forms.value.question != null && forms.value.type != null && forms.value.require != null && forms_answare.value[0].value != '' && forms_answare.value[0].desc != null) {
+                // console.log(forms_answare.value);
+                // console.log(forms.value);
+                QuestionService.addQuestion(forms.value).then(res => {
+                    const load = res.data;
+                    if (load.code == 200) {
+                        resetForm();
+                        toast.add({ severity: 'success', summary: 'Successfully', detail: `Data saved successfully`, life: 3000 });
+                        setTimeout(backToQuestion, 3000);
+                    } else {
+                        this.$refs.toast.add({ severity: 'warn', summary: 'Caution', detail: `Process failed`, life: 3000 });
+                    }
+                }).catch(error => {
+                    console.error(error.response.status);
+                    toast.add({ severity: 'danger', summary: 'Attention', detail: 'Unable to post data', life: 3000 });
+                })
+            } else {
+                toast.add({ severity: 'warn', summary: 'Caution', detail: `Harap diisi dengan lengkap`, life: 3000 });
+            }
         }
     } else if (params == 'edit') {
         forms.value.option_id = opt_id;
@@ -392,7 +408,7 @@ const postDialog = () => {
                                             <i class="pi pi-caret-down"></i>
                                         </span>
                                         <InputText placeholder="Desc" v-model="form.desc" />
-                                        <InputText placeholder="Value" v-model="form.value" />
+                                        <InputText placeholder="Value" v-model="form.value"/>
                                         <Button icon="pi pi-plus" severity="primary" @click="addsForm" outlined />
                                         <Button icon="pi pi-times" severity="danger" @click="removeForm(index)" :disabled="index == 0 ? true : false" outlined />
                                     </div>
@@ -413,7 +429,7 @@ const postDialog = () => {
                                             {{ index+1 }}
                                         </span>
                                         <InputText placeholder="Desc" v-model="form.desc"/>
-                                        <InputText placeholder="Value" v-model="form.value"/>
+                                        <InputNumber v-model="form.value" disabled/>
                                     </div>
                                 </div>
                                 <div class="flex justify-content-between">

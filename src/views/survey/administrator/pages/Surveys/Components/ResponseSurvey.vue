@@ -44,6 +44,7 @@ const loadSurvey = async () => {
         deskipsi.value = survey.desc;
 
         survey_pertanyaan.value = sp;
+        console.log(sp);
     } catch (error) {
         console.log(error.response.data)
     }
@@ -85,8 +86,10 @@ const loadSurvey = async () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div>
-                                    <li></li>
+                                <div v-show="questions.persentasi !== null">
+                                    <ul>
+                                        <li v-for="answare in questions.answers" :key="answare.optionId">{{ answare.description }}</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>

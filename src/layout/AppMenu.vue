@@ -44,7 +44,7 @@ const Menu = () => {
                 label: 'Management',
                 items: [
                     { label: 'Users', icon: 'pi pi-fw pi-users', to: '/users',},
-                    { label: 'Categories', icon: 'pi pi-fw pi-check-square', to: '/categories', },
+                    // { label: 'Categories', icon: 'pi pi-fw pi-check-square', to: '/categories', },
                     { label: 'Questions', icon: 'pi pi-fw pi-question-circle', to: '/questions', },
                     { label: 'Survey', icon: 'pi pi-fw pi-comments', to: '/survey', },
                     // { label: 'Response', icon: 'pi pi-fw pi-reply', to: '/respon', },
