@@ -69,7 +69,7 @@ const loadParams = () => {
                 setTimeout(function() {
                     loadings.value = false;
                     // window.location.replace("http://localhost:8086/home");
-                    window.location.replace("http://192.168.1.223:8086/home");
+                    // window.location.replace("http://192.168.1.223:8086/home");
                     // router.push('/home')
                 }, time.value);
             }
