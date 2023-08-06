@@ -333,7 +333,8 @@ const postDialog = () => {
                     <div class="formgrid grid">
                         <div class="field col-12 md:col-12 p-fluid">
                             <label for="firstname2">Pertanyaan</label>
-                            <Textarea v-model="forms.question" autoResize rows="8" cols="30" placeholder="Silahkan ajukan pertanyaan"/>
+                            <Editor v-model="forms.question" editorStyle="height: 120px" placeholder="Silahkan ajukan pertanyaan" />
+                            <!-- <Textarea v-model="forms.question" autoResize rows="8" cols="30" placeholder="Silahkan ajukan pertanyaan"/> -->
                         </div>
                         <div class="field col-12 md:col-6 p-fluid">
                             <label for="firstname2">Tanda wajib</label>

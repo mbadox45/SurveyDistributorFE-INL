@@ -3,6 +3,7 @@ import { onMounted, ref, computed } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useRouter, useRoute  } from 'vue-router';
 import moment from 'moment';
+import Editor from 'primevue/editor';
 
 // API
 import QuestionService from '@/api/QuestionService';
@@ -303,7 +304,8 @@ const postDialog = async () => {
                         </div>
                         <div class="field col-12 md:col-12">
                             <label for="firstname2">Deskripsi</label>
-                            <Textarea v-model="forms.desc" autoResize rows="5" cols="30" />
+                            <Editor v-model="forms.desc" editorStyle="height: 120px" placeholder="Deskripsikan untuk keterangan" />
+                            <!-- <Textarea v-model="forms.desc" autoResize rows="5" cols="30" /> -->
                         </div>
                         <div class="field col-12 md:col-12">
                             <strong>Tanggal Berlaku</strong>
@@ -320,15 +322,16 @@ const postDialog = async () => {
                             <Divider/>
                         </div>
                         <div class="field col-12 md:col-12" v-for="(form, index) in forms_chapter" :key="index">
-                            <p for="lastname2">Chapter {{ index+1 }}</p>
-                            <div class="p-inputgroup flex-1 mb-2">
-                                <span class="p-inputgroup-addon">
-                                    <i class="pi pi-question-circle"></i>
+                            <!-- <p for="lastname2">Chapter {{ index+1 }}</p> -->
+                            <div class="p-inputgroup flex-1">
+                                <span class="p-inputgroup-addon bg-gray-300">
+                                    <i class="pi pi-bookmark"></i>
                                 </span>
-                                <InputText id="text" type="text" v-model="form.order_sp"/>
+                                <InputText id="text" type="text" disabled class="bg-gray-300" :value="`Chapter ${index+1}`"/>
                                 <Button icon="pi pi-plus" severity="primary" @click="addsForm" outlined></Button>
                                 <Button icon="pi pi-minus" severity="danger" @click="removeForm(index)" :disabled="index == 0 ? true : false" outlined></Button>
                             </div>
+                            <Editor v-model="form.order_sp" editorStyle="height: 120px" class="mb-2" placeholder="Silahkan ajukan pertanyaan" />
                             <div class="formgrid grid justify-content-center">
                                 <div class="field col-11 md:col-11" v-for="(pertanyaan, subindex) in form.pertanyaan" :key="subindex">
                                     <label for="lastname2">Pertanyaan {{ subindex+1 }}</label>
@@ -336,7 +339,13 @@ const postDialog = async () => {
                                         <span class="p-inputgroup-addon">
                                             <i class="pi pi-question-circle"></i>
                                         </span>
-                                        <Dropdown v-model="form.pertanyaan[subindex]" :options="listQuestion" optionLabel="name" optionValue="question_order" filter placeholder="Pertanyaan" class="w-full md:w-17rem"></Dropdown>
+                                        <Dropdown v-model="form.pertanyaan[subindex]" :options="listQuestion" optionLabel="name" optionValue="question_order" filter placeholder="Pertanyaan">
+                                            <template #option="slotProps">
+                                                <div class="max-w-30rem flex text-wrap" style="white-space: pre-wrap;">
+                                                    <p v-html="slotProps.option.name"></p>
+                                                </div>
+                                            </template>
+                                        </Dropdown>
                                         <Button icon="pi pi-plus" severity="primary" @click="addsFormPertanyaaan(index)" outlined></Button>
                                         <Button icon="pi pi-minus" severity="danger" @click="removeSubEmail(index, subindex)" :disabled="subindex == 0 ? true : false" outlined></Button>
                                     </div>

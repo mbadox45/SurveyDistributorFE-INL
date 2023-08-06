@@ -50,7 +50,12 @@ const linked = (cond, id) => {
 }
 
 const previewQuestion = (id, path) => {
-    console.log(router.push({path:`${path}${id}`, target: '_blank'}))
+    router.push({path:`${path}${id}`, target: '_blank'})
+    // router.push({path:`/form/preview/${id}`, query:{title: title, desc:desc}, target: '_blank'});
+}
+
+const previewQuestion2 = (path) => {
+    router.push({path:`${path}${statusdialog.value}`, target: '_blank'})
     // router.push({path:`/form/preview/${id}`, query:{title: title, desc:desc}, target: '_blank'});
 }
 
@@ -100,15 +105,10 @@ const resetForm = () => {
     }
 }
 
-const showDialog = (status, id) => {
+const showDialog = (id) => {
     dialogs.value = true;
-    if (status == 'add') {
-        titledialogs.value = 'Create Survey';
-        statusdialog.value = status
-        resetForm()
-    } else {
-        titledialogs.value = 'Edit Survey';
-    }
+    titledialogs.value = 'Response Survey';
+    statusdialog.value = id;
 }
 
 const postDialog = () => {
@@ -133,29 +133,17 @@ const postDialog = () => {
                 <h4>{{titledialogs}}</h4>
             </template>
             <div class="p-fluid formgrid grid">
-                <div class="field col-12 md:col-12">
-                    <label for="firstname2">Judul</label>
-                    <InputText id="email" type="email" v-model="forms.title"/>
-                </div>
-                <div class="field col-12 md:col-12">
-                    <label for="firstname2">Deskripsi</label>
-                    <Textarea v-model="forms.desc" autoResize rows="5" cols="30" />
-                </div>
-                <div class="field col-12 md:col-12">
-                    <strong>Tanggal Berlaku</strong>
+                <div class="field col-6 md:col-6">
+                    <label for="lastname2">By Survey</label>
+                    <Button label="Go to response by survey" @click="previewQuestion2('/response-survey/')" icon="pi pi-link" class="p-button-outlined p-button-info" />
                 </div>
                 <div class="field col-6 md:col-6">
-                    <label for="lastname2">Mulai</label>
-                    <Calendar inputId="calendar" v-model="forms.from"></Calendar>
-                </div>
-                <div class="field col-6 md:col-6">
-                    <label for="lastname2">Sampai</label>
-                    <Calendar inputId="calendar" v-model="forms.to"></Calendar>
+                    <label for="lastname2">By User</label>
+                    <Button label="Go to response by user" disabled icon="pi pi-link" class="p-button-outlined p-button-success" />
                 </div>
             </div>
             <template #footer>
-                <Button label="No" icon="pi pi-times" @click="dialogs = false" class="p-button-outlined p-button-danger" />
-                <Button label="Save" icon="pi pi-save" @click="postDialog" class="p-button-outlined p-button-success" autofocus :disabled="disablebtnchangepass" />
+                <Button label="Cancel" icon="pi pi-times" @click="dialogs = false" class="p-button-outlined p-button-danger" />
             </template>
         </Dialog>
         <div class="col-12 md:col-12">
@@ -199,8 +187,8 @@ const postDialog = () => {
                                 <div class="flex flex-row md:flex-column justify-content-between w-full md:w-auto align-items-center md:align-items-end mt-5 md:mt-0">
                                     <Button icon="pi pi-pencil" v-tooltip.left="'Edit Survey'" class="mb-2" severity="warning" size="small" rounded @click="linked('edit',slotProps.data.id)"></Button>
                                     <Button icon="pi pi-external-link" class="mb-2" v-tooltip.left="'Preview'" severity="success" size="small" rounded @click="previewQuestion(slotProps.data.id, '/form/preview/')"></Button>
-                                    <Button icon="pi pi-percentage" class="mb-2" v-tooltip.left="'Respon'" severity="primary" size="small" rounded @click="previewQuestion(slotProps.data.id, '/response-survey/')"></Button>
-                                    <!-- <span :class="'product-badge status-' + slotProps.data.inventoryStatus.toLowerCase()">{{ slotProps.data.inventoryStatus }}</span> -->
+                                    <!-- <Button icon="pi pi-percentage" class="mb-2" v-tooltip.left="'Respon'" severity="primary" size="small" rounded @click="previewQuestion(slotProps.data.id, '/response-survey/')"></Button> -->
+                                    <Button icon="pi pi-percentage" class="mb-2" v-tooltip.left="'Respon'" severity="primary" size="small" rounded @click="showDialog(slotProps.data.id)"></Button>
                                 </div>
                             </div>
                         </div>

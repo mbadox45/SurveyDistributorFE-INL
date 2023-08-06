@@ -175,7 +175,7 @@ const postDialog = () => {
                             <div class="flex flex-column md:flex-row align-items-center p-3 w-full">
                                 <img :src="'/question.png'" :alt="slotProps.data.question" class="my-4 md:my-0 w-8 md:w-7rem mr-5" />
                                 <div class="flex-1 text-center md:text-left">
-                                    <div class="font-bold text-2xl" style="color: #F1C40F;">{{ slotProps.data.question }}</div>
+                                    <div class="font-bold text-xl" style="color: #F1C40F;" v-html="slotProps.data.question"></div>
                                     <!-- <Rating :modelValue="slotProps.data.rating" :readonly="true" :cancel="false" class="mb-2"></Rating> -->
                                     <div class="flex align-items-center lg:text-left sm:text-center">
                                         <i v-show="slotProps.data.type=='checkbox'" class="pi pi-check-square mr-2"></i>

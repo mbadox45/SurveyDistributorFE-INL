@@ -176,7 +176,7 @@ const link = () => {
 </script>
 
 <template>
-    <div class="flex justify-content-center min-h-screen overflow-hidden pb-6 bg-no-repeat bg-cover" style="background-image: url('/layout/bg4.jpg');">
+    <div class="flex justify-content-center min-h-screen overflow-hidden pb-6 bg-contain" style="background-image: url('/layout/bg4.jpg');">
         <!-- <Toast position="bottom-center"/> -->
         <div class="grid w-full justify-content-center">
             <div class="col-12 md:col-8 sm:col-8 bg-white mt-6 border-round-md" v-show="finished == '-'">
@@ -196,11 +196,19 @@ const link = () => {
                 </div> -->
                 <Divider/>
                 <div class="card shadow-3" v-for="list in pertanyaan" :key="list.id">
-                    <div class="bg-yellow-200 p-1">
-                        <h4 class="text-cyan-700 text-2xl lg:text-2xl sm:text-md text-center">{{ list.value.toUpperCase() }}</h4>
+                    <div class="bg-orange-100 border-round-md pt-2 px-2">
+                        <span class="text-cyan-800" v-html="list.value"></span>
+                        <Divider/>
                     </div>
                     <div v-for="question in list.question" :key="question.id" class="my-4">
-                        <pre class="font-medium md:text-lg sm:text-xs" style="font-family: Arial, Helvetica, sans-serif; white-space: pre-wrap;">{{ question.question }} <span class="text-red-600 font-bold" v-show="question.require==true">*</span> </pre>
+                        <div class="grid align-items-center">
+                            <div class="">
+                                <pre class="font-medium md:text-lg sm:text-xs" style="font-family: Arial, Helvetica, sans-serif; white-space: pre-wrap;" v-html="`${question.question}`"></pre>
+                            </div>
+                            <div class="">
+                                <span class="text-red-600 font-bold text-sm mx-2" v-show="question.require==true">(*)</span>
+                            </div>
+                        </div>
                         <div v-show="question.type == 'checkbox'">
                             <div v-for="options in question.options" :key="options.id" class="my-1 flex align-items-center">
                                 <Checkbox :value="options.id" v-model="question.model" />
@@ -239,6 +247,11 @@ const link = () => {
                 <div class="flex justify-content-between">
                     <Button label="BACK" severity="danger" icon="pi pi-arrow-left" size="small" @click="link"></Button>
                     <Button label="SUBMIT" severity="primary" size="small" :disabled="roles == 'admin' ? true : false" @click="submitForm"></Button>
+                </div>
+                <Divider/>
+                <div class="flex-1 ">
+                    <div class="w-full text-right text-lg"><strong>SURVEY - INL</strong></div>
+                    <div class="w-full text-right text-lg"><strong>ICT Development</strong> &copy; 2023 - PT. Industri Nabati Lestari</div>
                 </div>
             </div>
             <div class="col-12 md:col-8 sm:col-8 bg-white mt-6 border-round-md" v-show="finished == 'sukses'">

@@ -57,8 +57,8 @@ const onSubmit = (e) => {
                     localStorage.setItem('roles', roles);
                     localStorage.setItem('usertoken', token);
                     localStorage.setItem('payload', JSON.stringify(payload));
-                    window.location.replace("http://192.168.1.223:8086/beranda");
-                    // window.location.replace("http://localhost:8086/beranda");
+                    // window.location.replace("http://192.168.1.223:8086/beranda");
+                    window.location.replace("http://localhost:8086/beranda");
                 } else {
                     toast.add({ severity: 'warn', summary: 'Attention', detail: 'The password or email you entered is incorrect, please try again', life: 3000 });
                     console.log(load);
