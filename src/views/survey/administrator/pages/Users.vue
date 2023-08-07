@@ -111,8 +111,8 @@ const postDialog = () => {
         UserService.addUser(forms.value).then(res => {
             const load = res.data;
             if (load.code == 200) {
-                loadUser();
                 toast.add({ severity: 'success', summary: 'Successfully', detail: `Data saved successfully`, life: 3000 });
+                setTimeout(loadUser(), 2000);
             } else {
                 toast.add({ severity: 'warn', summary: 'Caution', detail: `Process failed`, life: 3000 });
             }
@@ -125,8 +125,8 @@ const postDialog = () => {
         UserService.addUser(forms.value).then(res => {
             const load = res.data;
             if (load.code == 200) {
-                loadUser();
                 toast.add({ severity: 'success', summary: 'Successfully', detail: `Data saved successfully`, life: 3000 });
+                setTimeout(loadUser(), 2000);
             } else {
                 toast.add({ severity: 'warn', summary: 'Caution', detail: `Process failed`, life: 3000 });
             }
@@ -138,8 +138,8 @@ const postDialog = () => {
         UserService.updateUser(forms.value.id,forms.value).then(res => {
             const load = res.data;
             if (load.code == 200) {
-                loadUser();
                 toast.add({ severity: 'success', summary: 'Successfully', detail: `Data saved successfully`, life: 3000 });
+                setTimeout(loadUser(), 2000);
             } else {
                 toast.add({ severity: 'warn', summary: 'Caution', detail: `Process failed`, life: 3000 });
             }
