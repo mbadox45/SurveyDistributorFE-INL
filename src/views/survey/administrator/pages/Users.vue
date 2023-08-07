@@ -112,7 +112,7 @@ const postDialog = () => {
             const load = res.data;
             if (load.code == 200) {
                 toast.add({ severity: 'success', summary: 'Successfully', detail: `Data saved successfully`, life: 3000 });
-                setTimeout(loadUser(), 2000);
+                setTimeout(loadUser(), 3000);
             } else {
                 toast.add({ severity: 'warn', summary: 'Caution', detail: `Process failed`, life: 3000 });
             }
@@ -126,7 +126,7 @@ const postDialog = () => {
             const load = res.data;
             if (load.code == 200) {
                 toast.add({ severity: 'success', summary: 'Successfully', detail: `Data saved successfully`, life: 3000 });
-                setTimeout(loadUser(), 2000);
+                setTimeout(loadUser(), 3000);
             } else {
                 toast.add({ severity: 'warn', summary: 'Caution', detail: `Process failed`, life: 3000 });
             }
@@ -139,7 +139,7 @@ const postDialog = () => {
             const load = res.data;
             if (load.code == 200) {
                 toast.add({ severity: 'success', summary: 'Successfully', detail: `Data saved successfully`, life: 3000 });
-                setTimeout(loadUser(), 2000);
+                setTimeout(loadUser(), 3000);
             } else {
                 toast.add({ severity: 'warn', summary: 'Caution', detail: `Process failed`, life: 3000 });
             }
@@ -162,7 +162,7 @@ const postDialog = () => {
             <div class="p-fluid formgrid grid" v-if="statusdialog != 'delete'">
                 <div class="field col-12 md:col-12">
                     <label for="firstname2">Distributor Name</label>
-                    <InputText id="email" type="text" placeholder="CV. Maju Jaya Sempurna" v-model="forms.name"/>
+                    <InputText type="text" placeholder="CV. Maju Jaya Sempurna" v-model="forms.name"/>
                 </div>
                 <div class="field col-12 md:col-12">
                     <label for="firstname2">Email</label>
