@@ -429,8 +429,8 @@ const postDialog = () => {
                                         <span class="p-inputgroup-addon">
                                             {{ index+1 }}
                                         </span>
-                                        <InputText placeholder="Contoh: Sangat Puas" v-model="form.desc"/>
-                                        <InputText placeholder="Contoh: sangat_puas" v-model="form.value"/>
+                                        <InputText placeholder="Contoh: Sangat Setuju" v-model="form.desc"/>
+                                        <InputText placeholder="Contoh: sangat_setuju" v-model="form.value"/>
                                     </div>
                                 </div>
                                 <div class="flex justify-content-between">
