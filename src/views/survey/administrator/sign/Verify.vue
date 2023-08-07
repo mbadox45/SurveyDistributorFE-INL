@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute  } from 'vue-router';
 import VerifyService from '@/api/VerifyService';
+import { URL_WEB, URL_WEB_Portal} from '@/api/DataVariable';
 
 const router = useRouter();
 const route = useRoute();
@@ -30,8 +31,7 @@ const loadParams = () => {
         if (Date.now() > expirationTime) {
             setTimeout(function() {
                 loadings.value = false;
-                window.location.replace("http://192.168.1.223:8085/auth/login");
-                // window.location.replace("http://localhost:5173/auth/login");
+                window.location.replace(`${URL_WEB_Portal}auth/login`);
                 console.log('token expired')
             }, time.value);
         } else {
@@ -61,8 +61,7 @@ const loadParams = () => {
                 })
                 setTimeout(function() {
                     loadings.value = false;
-                    // window.location.replace("http://localhost:8086/home");
-                    window.location.replace("http://192.168.1.223:8085/home");
+                    window.location.replace(`${URL_WEB}home`);
                     // router.push('/home')
                 }, time.value);
             } else {

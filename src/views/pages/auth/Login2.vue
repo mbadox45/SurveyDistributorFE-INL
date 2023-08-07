@@ -10,6 +10,7 @@ import AppConfig from '@/layout/AppConfig.vue';
 
 // API
 import AuthService from '@/api/AuthService';
+import { URL_WEB, URL_WEB_Portal } from '@/api/DataVariable';
 
 const toast = useToast();
 const router = useRouter();
@@ -25,7 +26,7 @@ const logoUrl = computed(() => {
 
 const link = (item) => {
     if (item == 'sso') {
-        location.replace("http://localhost:5173");
+        location.replace(`${URL_WEB_Portal}`);
     } else {
         router.push('/forgot-password');
     }
@@ -57,7 +58,7 @@ const onSubmit = (e) => {
                     localStorage.setItem('roles', roles);
                     localStorage.setItem('usertoken', token);
                     localStorage.setItem('payload', JSON.stringify(payload));
-                    window.location.replace("http://192.168.1.223:8086/beranda");
+                    window.location.replace(`${URL_WEB}beranda`);
                     // window.location.replace("http://localhost:8086/beranda");
                 } else {
                     toast.add({ severity: 'warn', summary: 'Attention', detail: 'The password or email you entered is incorrect, please try again', life: 3000 });

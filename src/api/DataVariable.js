@@ -2,6 +2,17 @@ import moment from "moment/moment"
 const date_now = moment().format('DD-MM-YYYY')
 const date_ago =  moment().subtract(10, 'days').format('DD-MM-YYYY');
 
+// Server Access
+export const URL_WEB = 'http://192.168.1.223:8086/';
+export const URL_API = 'http://192.168.1.223:3001/api/';
+export const URL_WEB_Portal = 'http://192.168.1.223:8085/';
+export const URL_API_Portal = 'http://36.92.181.10:4763/api/';
+
+// // Local Access
+// export const URL_WEB = 'http://localhost:8086/';
+// export const URL_API = 'http://localhost:8000/api/';
+// export const URL_WEB_Portal = 'http://localhost:8085/';
+// export const URL_API_Portal = 'http://36.92.181.10:4763/api/';
 
 // List for dropdown
 export const listAkses = [
