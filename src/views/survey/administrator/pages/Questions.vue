@@ -58,6 +58,7 @@ const loadSurvey = () => {
             const data = load.data;
             // console.log(data);
             const list = [];
+            data.sort((a, b) => a.id - b.id);
             for (let i = 0; i < data.length; i++) {
                 list[i] = {
                     id:data[i].id,
