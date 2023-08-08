@@ -95,6 +95,7 @@ const showDialog = (status, item) => {
         };
     } else {
         titledialogs.value = 'Edit User';
+        statusdialog.value = status
         forms.value = {
             id: item.id,
             name: item.name,
