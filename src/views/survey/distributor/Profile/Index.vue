@@ -33,7 +33,11 @@ const submitUpdate = () => {
     try {
         if (formUpdate.value.password != '' && formUpdate.value.c_password != '') {
             if (formUpdate.value.password == formUpdate.value.c_password) {
-                UserService.updateUser(formUpdate.value).then(res => {
+                const f_update = `{
+                    "password" : "${formUpdate.value.password}",
+                    "c-password": "${formUpdate.value.c_password}"
+                }`
+                UserService.updateUser(f_update).then(res => {
                     const load = res.data;
                     resetForm();
                     msg.value = 'success';
@@ -52,6 +56,7 @@ const submitUpdate = () => {
         } else {
             msg.value = 'error';
         }
+        // toast.add({ severity: 'danger', summary: 'Attention', detail: 'Please complete the form', life: 3000 });
     }
 };
 
