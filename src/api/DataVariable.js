@@ -4,7 +4,7 @@ const date_ago =  moment().subtract(10, 'days').format('DD-MM-YYYY');
 
 // Public Access
 export const URL_WEB = 'http://36.92.181.10:3777/';
-export const URL_API = 'http://36:92.181.10:3888/api/';
+export const URL_API = 'http://36.92.181.10:3888/api/';
 export const URL_WEB_Portal = 'http://192.168.1.223:8085/';
 export const URL_API_Portal = 'http://36.92.181.10:4763/api/';
 
