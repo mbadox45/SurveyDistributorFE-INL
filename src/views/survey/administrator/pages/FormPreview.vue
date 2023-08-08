@@ -283,7 +283,7 @@ const link = () => {
                     </div>
                 </div>
                 <div class="mt-8 text-center">
-                    <h1 class="font-normal">Anda sudah mengisi form sebelumnya, <br/> terimakasih telah berpartisipasi.</h1>
+                    <h1 class="font-normal">Pengisian form telah berakhir, <br/> terimakasih telah berpartisipasi.</h1>
                     <h5 class="font-bold text-bluegray-200 mb-6">{{surveys.title}}</h5>
                     <Button label="Back to the list survey page" severity="warning" outlined size="small" @click="link"></Button>
                 </div>

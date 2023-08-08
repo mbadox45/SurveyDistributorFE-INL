@@ -120,7 +120,7 @@ const postDialog = () => {
             console.error(error.response.status);
             toast.add({ severity: 'danger', summary: 'Attention', detail: 'Unable to post data', life: 3000 });
         })
-        setTimeout(loadUser(), 3000);
+        setTimeout(() => {loadUser();}, 3000);
     } else if (statusdialog.value == 'delete') {
         // console.log(statusdialog.value)
         UserService.addUser(forms.value).then(res => {
@@ -135,7 +135,7 @@ const postDialog = () => {
             console.error(error.response.status);
             toast.add({ severity: 'danger', summary: 'Attention', detail: 'Unable to post data', life: 3000 });
         })
-        setTimeout(loadUser(), 3000);
+        setTimeout(() => {loadUser();}, 3000);
     } else {
         UserService.updateUser(forms.value.id,forms.value).then(res => {
             const load = res.data;
@@ -149,7 +149,7 @@ const postDialog = () => {
             console.error(error.response.status);
             toast.add({ severity: 'danger', summary: 'Attention', detail: 'Unable to post data', life: 3000 });
         })
-        setTimeout(loadUser(), 3000);
+        setTimeout(() => {loadUser();}, 3000);
     }
 }
 
