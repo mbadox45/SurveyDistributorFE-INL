@@ -41,6 +41,7 @@ const loadUser = () => {
         if (load.code == 200) {
             const data = load.data;
             // console.log(load);
+            data.sort((a, b) => a.id - b.id);
             const list = [];
             for (let i = 0; i < data.length; i++) {
                 list[i] = {
