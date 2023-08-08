@@ -59,6 +59,8 @@ const loadSurvey = () => {
                     } else {
                         model = '';
                     }
+                    const options = question[a].options
+                    options.sort((a, b) => a.id - b.id);
                     questions[a] = {
                         category_id: question[a].category_id,
                         question: question[a].question,
@@ -66,7 +68,7 @@ const loadSurvey = () => {
                         status: question[a].status,
                         type: question[a].type,
                         id: question[a].id,
-                        options: question[a].options,
+                        options: options,
                         pivot: question[a].pivot,
                         model: model,
                         model_extra: '',
