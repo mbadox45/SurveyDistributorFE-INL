@@ -49,6 +49,7 @@ const loadSurvey = () => {
                 const question = sp[i].questions;
                 const questions = [];
 
+                question.sort((a, b) => a.id - b.id);
                 // Proses penambahan v-model yaitu "model" sebagai media input komponen form
                 for (let a = 0; a < question.length; a++) {
                     let model;
