@@ -113,7 +113,6 @@ const postDialog = () => {
             const load = res.data;
             if (load.code == 200) {
                 toast.add({ severity: 'success', summary: 'Successfully', detail: `Data saved successfully`, life: 3000 });
-                setTimeout(loadUser(), 3000);
             } else {
                 toast.add({ severity: 'warn', summary: 'Caution', detail: `Process failed`, life: 3000 });
             }
@@ -121,13 +120,14 @@ const postDialog = () => {
             console.error(error.response.status);
             toast.add({ severity: 'danger', summary: 'Attention', detail: 'Unable to post data', life: 3000 });
         })
+        setTimeout(loadUser(), 3000);
     } else if (statusdialog.value == 'delete') {
         // console.log(statusdialog.value)
         UserService.addUser(forms.value).then(res => {
             const load = res.data;
             if (load.code == 200) {
                 toast.add({ severity: 'success', summary: 'Successfully', detail: `Data saved successfully`, life: 3000 });
-                setTimeout(loadUser(), 3000);
+                // setTimeout(loadUser(), 3000);
             } else {
                 toast.add({ severity: 'warn', summary: 'Caution', detail: `Process failed`, life: 3000 });
             }
@@ -135,12 +135,13 @@ const postDialog = () => {
             console.error(error.response.status);
             toast.add({ severity: 'danger', summary: 'Attention', detail: 'Unable to post data', life: 3000 });
         })
+        setTimeout(loadUser(), 3000);
     } else {
         UserService.updateUser(forms.value.id,forms.value).then(res => {
             const load = res.data;
             if (load.code == 200) {
                 toast.add({ severity: 'success', summary: 'Successfully', detail: `Data saved successfully`, life: 3000 });
-                setTimeout(loadUser(), 3000);
+                // setTimeout(loadUser(), 3000);
             } else {
                 toast.add({ severity: 'warn', summary: 'Caution', detail: `Process failed`, life: 3000 });
             }
@@ -148,6 +149,7 @@ const postDialog = () => {
             console.error(error.response.status);
             toast.add({ severity: 'danger', summary: 'Attention', detail: 'Unable to post data', life: 3000 });
         })
+        setTimeout(loadUser(), 3000);
     }
 }
 
