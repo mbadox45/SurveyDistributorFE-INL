@@ -90,12 +90,12 @@ const submitUpdate = () => {
                         <div class="field col-12 md:col-12">
                             <label for="firstname2">Password</label>
                             <Password id="password1" v-model="formUpdate.password" placeholder="Password" :feedback="false" :toggleMask="true" class="w-full" inputClass="w-full" inputStyle="padding:1rem"></Password>
-                            <small>Min. 8 Characters, Password must contain at least one uppercase letter, one lowercase letter, one symbol, and one number</small>
+                            <small class="text-pink-500">Min. 8 Characters, at least one uppercase letter, one lowercase letter, one symbol, and one number</small>
                         </div>
                         <div class="field col-12 md:col-12">
                             <label for="firstname2">Re-Password</label>
                             <Password id="password1" v-model="formUpdate.c_password" placeholder="Re-Password" :feedback="false" :toggleMask="true" class="w-full" inputClass="w-full" inputStyle="padding:1rem"></Password>
-                            <small>Min. 8 Characters, Password must contain at least one uppercase letter, one lowercase letter, one symbol, and one number</small>
+                            <small class="text-pink-500">Min. 8 Characters, at least one uppercase letter, one lowercase letter, one symbol, and one number</small>
                         </div>
                     </div>
                     <div class="flex justify-content-end">
