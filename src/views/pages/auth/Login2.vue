@@ -112,7 +112,7 @@ const onSubmit = (e) => {
 
                     <div class="flex align-items-center justify-content-between mb-5 gap-5">
                         <div class="flex align-items-center">
-                            <a class="font-medium no-underline cursor-pointer" @click="link('password')" ><i class="pi pi-pi-book mr-2"></i> Manual Book</a>
+                            <a class="font-medium no-underline cursor-pointer" @click="link('password')" ><i class="pi pi-book mr-2"></i> Manual Book</a>
                         </div>
                         <!-- <a class="font-medium no-underline ml-2 text-right cursor-pointer" @click="link('password')"></a> -->
                     </div>
