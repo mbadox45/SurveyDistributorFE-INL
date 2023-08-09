@@ -28,7 +28,11 @@ const link = (item) => {
     if (item == 'sso') {
         location.replace(`${URL_WEB_Portal}`);
     } else {
-        router.push('/forgot-password');
+        window.open(
+            'https://drive.google.com/file/d/1wp1BctZVqXMtmhxyYBhNufwY8oUkVlsi/view',
+            '_blank' // <- This is what makes it open in a new window.
+        );
+        // router.push('/forgot-password');
     }
 }
 
@@ -108,9 +112,9 @@ const onSubmit = (e) => {
 
                     <div class="flex align-items-center justify-content-between mb-5 gap-5">
                         <div class="flex align-items-center">
-                            <a class="font-medium no-underline cursor-pointer" @click="link('sso')" >Login with Portal APPS</a>
+                            <a class="font-medium no-underline cursor-pointer" @click="link('password')" >Manual Book</a>
                         </div>
-                        <!-- <a class="font-medium no-underline ml-2 text-right cursor-pointer" @click="link('password')">Forgot password?</a> -->
+                        <!-- <a class="font-medium no-underline ml-2 text-right cursor-pointer" @click="link('password')"></a> -->
                     </div>
                     <label v-if="isLoading == true" class="block text-900 text-xl font-medium mb-2">Loading ...</label>
                     <Button label="Sign In" class="w-full p-3 text-xl bg-blue-800 border-none" type="submit" rounded></Button>
