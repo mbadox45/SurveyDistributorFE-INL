@@ -304,8 +304,8 @@ const postDialog = async () => {
                         </div>
                         <div class="field col-12 md:col-12">
                             <label for="firstname2">Deskripsi</label>
-                            <Editor v-model="forms.desc" editorStyle="height: 120px" placeholder="Deskripsikan untuk keterangan" />
-                            <!-- <Textarea v-model="forms.desc" autoResize rows="5" cols="30" /> -->
+                            <!-- <Editor v-model="forms.desc" editorStyle="height: 120px" placeholder="Deskripsikan untuk keterangan" /> -->
+                            <Textarea v-model="forms.desc" autoResize rows="5" cols="30" />
                         </div>
                         <div class="field col-12 md:col-12">
                             <strong>Tanggal Berlaku</strong>
