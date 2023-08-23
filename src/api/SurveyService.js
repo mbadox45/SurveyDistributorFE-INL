@@ -23,7 +23,7 @@ export default new class SurveyService{
         return http.get(`answer/all/${id}`);
     }
     getAnswerSurveyByUserAndID(id,data){
-        return http.get(`survey/individual/${id}`,data);
+        return http.post(`answer/individual/${id}`,data);
     }
 
     // Distributor/User

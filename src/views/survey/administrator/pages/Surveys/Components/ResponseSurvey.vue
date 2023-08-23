@@ -179,7 +179,7 @@ const loadSurvey = async () => {
                                     </div>
                                 </div>
                                 <ul>
-                                    <li v-for="answare in questions.answers" :key="answare.optionId">{{ answare.description }}</li>
+                                    <li v-for="answare in questions.answers" :key="answare.optionId">{{ answare.description }} <strong> <i class="pi pi-angle-double-right mx-3"></i>{{ answare.user_name }}</strong></li>
                                 </ul>
                                 <div v-show="questions.persentasi !== null">
                                     <Divider align="center" type="dashed">

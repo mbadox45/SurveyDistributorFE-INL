@@ -24,6 +24,8 @@ const date = new Date();
 const statusdialog = ref(null);
 const list_Survey = ref([]);
 const loadings = ref(true)
+const titles = ref()
+const descs = ref()
 
 const payload = JSON.parse(localStorage.getItem('payload'));
 const breadcrumbHome = ref({ icon: 'pi pi-home', to: '/home' });
@@ -55,7 +57,7 @@ const previewQuestion = (id, path) => {
 }
 
 const previewQuestion2 = (path) => {
-    router.push({path:`${path}${statusdialog.value}`, target: '_blank'})
+    router.push({path:`${path}${statusdialog.value}`, query:{title: titles.value, desc:descs.value}, target: '_blank'})
     // router.push({path:`/form/preview/${id}`, query:{title: title, desc:desc}, target: '_blank'});
 }
 
@@ -105,10 +107,12 @@ const resetForm = () => {
     }
 }
 
-const showDialog = (id) => {
+const showDialog = (id, title, desc) => {
     dialogs.value = true;
     titledialogs.value = 'Response Survey';
     statusdialog.value = id;
+    titles.value = title;
+    descs.value = desc;
 }
 
 const postDialog = () => {
@@ -139,7 +143,7 @@ const postDialog = () => {
                 </div>
                 <div class="field col-6 md:col-6">
                     <label for="lastname2">By User</label>
-                    <Button label="Go to response by user" disabled icon="pi pi-link" class="p-button-outlined p-button-success" />
+                    <Button label="Go to response by user" icon="pi pi-link" class="p-button-outlined p-button-success" @click="previewQuestion2('/response-survey-byuser/')"/>
                 </div>
             </div>
             <template #footer>
@@ -188,7 +192,7 @@ const postDialog = () => {
                                     <Button icon="pi pi-pencil" v-tooltip.left="'Edit Survey'" class="mb-2" severity="warning" size="small" rounded @click="linked('edit',slotProps.data.id)"></Button>
                                     <Button icon="pi pi-external-link" class="mb-2" v-tooltip.left="'Preview'" severity="success" size="small" rounded @click="previewQuestion(slotProps.data.id, '/form/preview/')"></Button>
                                     <!-- <Button icon="pi pi-percentage" class="mb-2" v-tooltip.left="'Respon'" severity="primary" size="small" rounded @click="previewQuestion(slotProps.data.id, '/response-survey/')"></Button> -->
-                                    <Button icon="pi pi-percentage" class="mb-2" v-tooltip.left="'Respon'" severity="primary" size="small" rounded @click="showDialog(slotProps.data.id)"></Button>
+                                    <Button icon="pi pi-percentage" class="mb-2" v-tooltip.left="'Respon'" severity="primary" size="small" rounded @click="showDialog(slotProps.data.id, slotProps.data.title, slotProps.data.desc)"></Button>
                                 </div>
                             </div>
                         </div>

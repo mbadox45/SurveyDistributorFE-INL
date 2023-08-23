@@ -121,6 +121,15 @@ const router = createRouter({
                         admin:true,
                     }
                 },
+                {
+                    path: '/response-survey-byuser/:id',
+                    name: 'response-survey-byuser',
+                    component: () => import('@/views/survey/administrator/pages/Surveys/Components/ResponseUser.vue'),
+                    meta:{
+                        requiresAuth: true,
+                        admin:true,
+                    }
+                },
             ]
         },
         {
