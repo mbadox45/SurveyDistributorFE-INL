@@ -197,7 +197,7 @@ const loadSurvey = async () => {
                                         </div>
                                         <div v-if="answare.extraAnswers != null" class="flex gap-2">
                                             <strong class="ml-3">Response : </strong>
-                                            <span>Test</span>
+                                            <span>{{ answare.extraAnswers.value}}</span>
                                         </div>
                                     </li>
                                 </ul>
