@@ -12,6 +12,7 @@ const judul = ref(null);
 const deskipsi = ref(null);
 const survey_pertanyaan = ref([]);
 const datachart = ref();
+const loading = ref(false)
 const colorcode = ref(['#C0392B','#8E44AD', '#2980B9', '#16A085', '#27AE60', '#F39C12', '#D35400']);
 const colorcodehover = ref(['#EC7063', '#AF7AC5', '#5DADE2', '#48C9B0', '#58D68D', '#F4D03F', '#EB984E']);
 const labelchart = ref({
@@ -67,6 +68,7 @@ const setChartData = (label, data, bg, bgh) => {
 }
 
 const loadSurvey = async () => {
+    loading.value = true
     try {
         const response = await SurveyService.getAnswerSurveyByID(params)
         const load = response.data
@@ -135,9 +137,10 @@ const loadSurvey = async () => {
                 questions: list_question,
             }
         }
-        console.log(list_sp);
+        loading.value = false
         survey_pertanyaan.value = list_sp;
     } catch (error) {
+        loading.value = false
         console.log(error.response.data)
     }
 }
@@ -150,7 +153,13 @@ const loadSurvey = async () => {
             <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" class="bg-gray-300" />
         </div>
         <div class="col-12 md:col-12">
-            <div class="card">
+            <div class="flex align-items-center justify-content-center mb-3" v-if="loading == true">
+                <div class="">
+                    <ProgressSpinner aria-label="Loading" style="width: 50px; height: 50px" />
+                </div>
+                <div class="text-gray-500 font-semibold">Please wait ...</div>
+            </div>
+            <div class="card" v-else>
                 <div class="grid">
                     <div class="col-6 md:col-6 sm:col-6">
                         <strong class="text-blue-800 text-2xl font-semibold">{{judul}}</strong><br/>
@@ -178,8 +187,19 @@ const loadSurvey = async () => {
                                         </div>
                                     </div>
                                 </div>
-                                <ul>
-                                    <li v-for="answare in questions.answers" :key="answare.optionId">{{ answare.description }} <strong> <i class="pi pi-angle-double-right mx-3"></i>{{ answare.user_name }}</strong></li>
+                                <ul class="flex flex-column gap-2">
+                                    <li v-for="answare in questions.answers" :key="answare.optionId" class="flex flex-column">
+                                        <div class="flex gap-2">
+                                            <strong>*</strong>
+                                            <span>{{ answare.description }}</span>
+                                            <strong> <i class="pi pi-angle-double-right"></i></strong>
+                                            <strong>{{ answare.user_name }}</strong>
+                                        </div>
+                                        <div v-if="answare.extraAnswers != null" class="flex gap-2">
+                                            <strong class="ml-3">Response : </strong>
+                                            <span>Test</span>
+                                        </div>
+                                    </li>
                                 </ul>
                                 <div v-show="questions.persentasi !== null">
                                     <Divider align="center" type="dashed">

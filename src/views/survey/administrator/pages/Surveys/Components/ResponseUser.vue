@@ -3,8 +3,9 @@ import { ref, onMounted, computed } from 'vue';
 import { useRoute  } from 'vue-router';
 
 // API
-import SurveyService from '@/api/SurveyService';
+import {loadAnsware_SurveyController} from '@/controllers/SurveyController';
 import UserService from '@/api/UserService';
+import {loadAll_UserController} from '@/controllers/UserController';
 import { FormPreview } from '@/api/DataVariable';
 
 const route = useRoute();
@@ -14,6 +15,7 @@ const survey_pertanyaan = ref([]);
 const list_user = ref([]);
 const datachart = ref();
 const selectUser = ref();
+const loading = ref(false)
 const colorcode = ref(['#C0392B','#8E44AD', '#2980B9', '#16A085', '#27AE60', '#F39C12', '#D35400']);
 const colorcodehover = ref(['#EC7063', '#AF7AC5', '#5DADE2', '#48C9B0', '#58D68D', '#F4D03F', '#EB984E']);
 const labelchart = ref({
@@ -57,10 +59,10 @@ const bcItems = () => {
 }
 
 const loadUser = async () => {
+    loading.value = true
     try {
-        const response = await UserService.getUsers()
-        const load = response.data;
-        const data = load.data;
+        const response = await loadAll_UserController()
+        const data = response;
         const list = [];
         for (let i = 0; i < data.length; i++) {
             list[i] = {
@@ -68,9 +70,11 @@ const loadUser = async () => {
                 id: data[i].id
             }
         }
+        loading.value = false
         list_user.value = list;
         // console.log(data)
     } catch (error) {
+        loading.value = false
         list_user.value = [];
         // console.log(error.response.data)
     }
@@ -91,14 +95,14 @@ const setChartData = (label, data, bg, bgh) => {
 
 const loadSurvey = async () => {
     // console.log(selectUser.value);
+    loading.value = true
     try {
-        const response = await SurveyService.getAnswerSurveyByUserAndID(params, {user_id:selectUser.value.id})
-        const load = response.data
+        const response = await loadAnsware_SurveyController(params, {user_id:selectUser.value.id})
+        const load = response
 
         // survey_pertanyaan.value = sp;
         // mengambil data sp untuk ditampilkan di chartjs
         const sp = load.survey_pertanyaans;
-        console.log(sp);
         const list_sp = [];
         for (let i = 0; i < sp.length; i++) {
             const element_sp = sp[i];
@@ -120,9 +124,10 @@ const loadSurvey = async () => {
                 questions: list_question,
             }
         }
-        console.log(list_sp);
+        loading.value = false
         survey_pertanyaan.value = list_sp;
     } catch (error) {
+        loading.value = false
         survey_pertanyaan.value = [];
         console.log(error.response.data)
     }
@@ -147,26 +152,34 @@ const loadSurvey = async () => {
                     </div>
                 </div>
                 <Divider type="dotted"/>
-                <div class="grid" v-if="selectUser !=null">
-                    <div class="col-12 md:col-12 sm:col-12" v-if="survey_pertanyaan.length > 0">
-                        <div v-for="list in survey_pertanyaan" :key="list.id">
-                            <div class="text-pink-700 px-3 py-2 bg-pink-100 border-round-md" v-html="list.value"></div>
-                            <div v-for="questions in list.questions" :key="questions.questionId" class="ml-5 md:ml-5 sm:ml-3 mt-2 mb-5">
-                                <strong class="font-semibold" v-html="questions.questionValue"></strong>
-                                <span>Answer:</span>
-                                <ul>
-                                    <li v-for="answare in questions.answers" :key="answare.optionId">{{ answare.description }}</li>
-                                </ul>
-                            </div>
-                            <Divider type="solid"></Divider>
-                        </div>
+                <div class="flex align-items-center justify-content-center mb-3" v-if="loading == true">
+                    <div class="">
+                        <ProgressSpinner aria-label="Loading" style="width: 50px; height: 50px" />
                     </div>
-                    <div class="col-12 md:col-12 sm:col-12" v-else>
-                        <h3 class="font-normal text-center"> {{ selectUser.name }} - Belum Mengisi Survey !</h3>
-                    </div>
+                    <div class="text-gray-500 font-semibold">Please wait ...</div>
                 </div>
                 <div v-else>
-                    <h3 class="font-normal  text-center">Silahkan Pilih User !</h3>
+                    <div class="grid" v-if="selectUser !=null">
+                        <div class="col-12 md:col-12 sm:col-12" v-if="survey_pertanyaan.length > 0">
+                            <div v-for="list in survey_pertanyaan" :key="list.id">
+                                <div class="text-pink-700 px-3 py-2 bg-pink-100 border-round-md" v-html="list.value"></div>
+                                <div v-for="questions in list.questions" :key="questions.questionId" class="ml-5 md:ml-5 sm:ml-3 mt-2 mb-5">
+                                    <strong class="font-semibold" v-html="questions.questionValue"></strong>
+                                    <span>Answer:</span>
+                                    <ul>
+                                        <li v-for="answare in questions.answers" :key="answare.optionId">{{ answare.description }}</li>
+                                    </ul>
+                                </div>
+                                <Divider type="solid"></Divider>
+                            </div>
+                        </div>
+                        <div class="col-12 md:col-12 sm:col-12" v-else>
+                            <h3 class="font-normal text-center"> {{ selectUser.name }} - Belum Mengisi Survey !</h3>
+                        </div>
+                    </div>
+                    <div v-else>
+                        <h3 class="font-normal  text-center">Silahkan Pilih User !</h3>
+                    </div>
                 </div>
             </div>
         </div>

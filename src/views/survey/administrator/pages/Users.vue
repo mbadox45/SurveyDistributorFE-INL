@@ -5,7 +5,8 @@ import { useToast } from 'primevue/usetoast';
 
 // API
 import UserService from '@/api/UserService';
-import { formUser, listuser} from '@/api/DataVariable';
+import {loadAll_UserController, addPost_UserController, updatePost_UserController} from '@/controllers/UserController';
+// import { } from '@/api/DataVariable';
 
 
 // Variable
@@ -17,10 +18,21 @@ const sortField = ref(null);
 
 const dialogs = ref(false)
 const titledialogs = ref(null);
-const forms = ref(formUser);
+const forms = ref({
+    id: null,
+    name: null,
+    email: null,
+});
 const statusdialog = ref(null);
 const listUsers = ref([]);
-const loadings = ref(true)
+const loadings = ref(false)
+const saving = ref(false)
+
+// Message Configure
+const messages = ref([]);
+let count = ref(0);
+const time = ref(3000);
+
 
 const payload = JSON.parse(localStorage.getItem('payload'));
 const tokens = localStorage.getItem('usertoken');
@@ -35,35 +47,17 @@ onMounted(() => {
 });
 
 // Function Private
-const loadUser = () => {
-    UserService.getUsers().then(res => {
-        const load = res.data;
-        if (load.code == 200) {
-            const data = load.data;
-            console.log(data);
-            data.sort((a, b) => b.id - a.id);
-            const list = [];
-            for (let i = 0; i < data.length; i++) {
-                list[i] = {
-                    id:data[i].id,
-                    email:data[i].email,
-                    name:data[i].name,
-                    status:data[i].status,
-                }
-            }
-            listUsers.value = list;
-            loadings.value = false;
-        } else {
-            listUsers.value = [];
-            loadings.value = false;
-            console.log('kosong');
-        }
-    }).catch(error => {
-        listUsers.value = [];
+const loadUser = async() => {
+    loadings.value = true;
+    try {
+        const response = await loadAll_UserController();
+        console.log(response)
+        listUsers.value = response;
         loadings.value = false;
-        console.error(error.response.status);
-    })
-    // console.log(tokens)
+    } catch (error) {
+        loadings.value = false;
+        listUsers.value = [];
+    }
 }
 
 const filteredList = computed(() => {
@@ -74,13 +68,14 @@ const filteredList = computed(() => {
 
 const resetForm = () => {
     forms.value = {
-        id: 0,
-        name: '',
-        email: '',
+        id: null,
+        name: null,
+        email: null,
     }
 }
 
 const showDialog = (status, item) => {
+    messages.value = [];
     dialogs.value = true;
     if (status == 'add') {
         titledialogs.value = 'Create User';
@@ -105,52 +100,50 @@ const showDialog = (status, item) => {
     }
 }
 
-const postDialog = () => {
-    // console.log(forms.value)
-    dialogs.value = false;
-    if (statusdialog.value == 'add') {
-        // console.log(statusdialog.value)
-        UserService.addUser(forms.value).then(res => {
-            const load = res.data;
-            if (load.code == 200) {
-                toast.add({ severity: 'success', summary: 'Successfully', detail: `Data saved successfully`, life: 3000 });
+const postDialog = async() => {
+    if (forms.value.name != null && forms.value.email != null && forms.value.name != '' && forms.value.email != '' ) {
+        saving.value = true;
+        if (statusdialog.value == 'add') {
+            const response = await addPost_UserController(forms.value);
+            if (response.code == 200) {
+                loadings.value = true
+                messages.value = [{ severity: "success", content: response.msg, id: count.value++ }];
+                setTimeout(() => {
+                    dialogs.value = false;
+                    loadings.value = false
+                    loadUser();
+                    saving.value = false;
+                }, 3000);
+            } else if (response.code == 400) {
+                saving.value = false;
+                messages.value = [{ severity: "warn", content: response.msg, id: count.value++ }];
             } else {
-                toast.add({ severity: 'warn', summary: 'Caution', detail: `Process failed`, life: 3000 });
+                saving.value = false;
+                messages.value = [{ severity: "error", content: response.msg, id: count.value++ }];
             }
-        }).catch(error => {
-            console.error(error.response.status);
-            toast.add({ severity: 'danger', summary: 'Attention', detail: 'Unable to post data', life: 3000 });
-        })
-        setTimeout(() => {loadUser();}, 3000);
-    } else if (statusdialog.value == 'delete') {
-        // console.log(statusdialog.value)
-        UserService.addUser(forms.value).then(res => {
-            const load = res.data;
-            if (load.code == 200) {
-                toast.add({ severity: 'success', summary: 'Successfully', detail: `Data saved successfully`, life: 3000 });
-                // setTimeout(loadUser(), 3000);
+        } else {
+            const response = await updatePost_UserController(forms.value.id, forms.value);
+            if (response.code == 200) {
+                loadings.value = true
+                messages.value = [{ severity: "success", content: response.msg, id: count.value++ }];
+                setTimeout(() => {
+                    dialogs.value = false;
+                    loadings.value = false
+                    loadUser();
+                    saving.value = false;
+                }, 3000);
+            } else if (response.code == 400) {
+                saving.value = false;
+                messages.value = [{ severity: "warn", content: response.msg, id: count.value++ }];
             } else {
-                toast.add({ severity: 'warn', summary: 'Caution', detail: `Process failed`, life: 3000 });
+                saving.value = false;
+                messages.value = [{ severity: "error", content: response.msg, id: count.value++ }];
             }
-        }).catch(error => {
-            console.error(error.response.status);
-            toast.add({ severity: 'danger', summary: 'Attention', detail: 'Unable to post data', life: 3000 });
-        })
-        setTimeout(() => {loadUser();}, 3000);
+        }
     } else {
-        UserService.updateUser(forms.value.id,forms.value).then(res => {
-            const load = res.data;
-            if (load.code == 200) {
-                toast.add({ severity: 'success', summary: 'Successfully', detail: `Data saved successfully`, life: 3000 });
-                // setTimeout(loadUser(), 3000);
-            } else {
-                toast.add({ severity: 'warn', summary: 'Caution', detail: `Process failed`, life: 3000 });
-            }
-        }).catch(error => {
-            console.error(error.response.status);
-            toast.add({ severity: 'danger', summary: 'Attention', detail: 'Unable to post data', life: 3000 });
-        })
-        setTimeout(() => {loadUser();}, 3000);
+        messages.value = [
+            { severity: "warn", content: "Mohon data diisi dengan lengkap", id: count.value++ },
+        ];
     }
 }
 
@@ -159,10 +152,10 @@ const postDialog = () => {
 <template>
     <div class="grid">
         <Toast/>
-        <Dialog v-model:visible="dialogs" :style="{ width: '450px' }" :modal="true">
-            <template #header>
-                <h4>{{titledialogs}}</h4>
-            </template>
+        <Dialog v-model:visible="dialogs" :header="titledialogs" :style="{ width: '450px' }" :modal="true" :closable="false">
+            <transition-group name="p-message" tag="div">
+                <Message v-for="msg of messages" :key="msg.id" :severity="msg.severity">{{msg.content}}</Message>
+            </transition-group>
             <div class="p-fluid formgrid grid" v-if="statusdialog != 'delete'">
                 <div class="field col-12 md:col-12">
                     <label for="firstname2">Distributor Name</label>
@@ -179,8 +172,8 @@ const postDialog = () => {
                 </div>
             </div>
             <template #footer>
-                <Button v-show="statusdialog != 'delete'" label="No" icon="pi pi-times" @click="dialogs = false" class="p-button-outlined p-button-danger" />
-                <Button label="Save" icon="pi pi-save" @click="postDialog" class="p-button-outlined p-button-success" autofocus :disabled="disablebtnchangepass" />
+                <Button v-show="statusdialog != 'delete'" label="No" icon="pi pi-times" @click="dialogs = false" class="p-button-outlined p-button-danger" :disabled="saving" />
+                <Button :label="saving == true ? 'Saving...' : 'Save'" :disabled="saving" icon="pi pi-save" @click="postDialog" class="p-button-outlined p-button-success" autofocus />
             </template>
         </Dialog>
         <div class="col-12 md:col-12">

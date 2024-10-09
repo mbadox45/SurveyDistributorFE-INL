@@ -4,6 +4,7 @@ import { useRouter, useRoute  } from 'vue-router';
 
 // API
 import SurveyService from '@/api/SurveyService';
+import {loadAvailable_SurveyController, loadAnswared_SurveyController} from '@/controllers/SurveyController';
 import { FormPreview } from '@/api/DataVariable';
 
 const router = useRouter();
@@ -13,7 +14,7 @@ const searchKeyword = ref('');
 const sortOrder = ref(null);
 const sortField = ref(null);
 const params = route.params.id;
-const loadings = ref(true)
+const loadings = ref(false)
 
 const token = localStorage.getItem('usertoken');
 const breadcrumbHome = ref({ icon: 'pi pi-home', to: '/home' });
@@ -29,64 +30,37 @@ onMounted(() => {
 });
 
 const loadSurvey = async () => {
-    console.log(token)
+    loadings.value = true;
     try {
-        // const response = await SurveyService.getSurveyAnswered();
-        const response = await SurveyService.getSurveyAvailable();
-        const answer = await surveyAnswered();
-        console.log(answer)
-        const load = response.data;
-        if (load.code == 200) {
-            const data = load.data;
-            const list = [];
-            for (let i = 0; i < data.length; i++) {
-                let ket = false;
-                if (answer.length > 0) {
-                    for (let a = 0; a < answer.length; a++) {
-                        if (data[i].id == answer[a].id) {
-                            ket = true
-                        }
+        const response = await loadAvailable_SurveyController();
+        const answer = await loadAnswared_SurveyController()
+        const list = []
+        for (let i = 0; i < response.length; i++) {
+            let ket = false;
+            if (answer != null) {
+                for (let a = 0; a < answer.length; a++) {
+                    if (response[i].id == answer[a].id) {
+                        ket = true
                     }
-                } else {
-                    ket = false;
                 }
-                list[i] = {
-                    id: data[i].id,
-                    title: data[i].title,
-                    desc: data[i].desc,
-                    from: data[i].from,
-                    to: data[i].to,
-                    status: data[i].status,
-                    ket: ket,
-                }
+            } else {
+                ket = false;
             }
-            listSurvey.value = list;
-            console.log(list);
-            loadings.value = false;
+            list[i] = {
+                id: response[i].id,
+                title: response[i].title,
+                desc: response[i].desc,
+                from: response[i].from,
+                to: response[i].to,
+                status: response[i].status,
+                ket: ket,
+            }
         }
+        listSurvey.value = list
+        loadings.value = false;
     } catch (error) {
-        const response = error.response.data
-        console.log(response);
         listSurvey.value = []
         loadings.value = false;
-    }
-}
-
-const surveyAnswered = async () => {
-    try {
-        const response = await SurveyService.getSurveyAnswered();
-        // const response = await SurveyService.getSurveyAvailable();
-        const load = response.data;
-        if (load.code == 200) {
-            const data = load.data;
-            console.log(data);
-            return data;
-        }
-    } catch (error) {
-        const response = error.response.data
-        // console.log(response);
-        const data = []
-        return data;
     }
 }
 

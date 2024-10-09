@@ -1,13 +1,14 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute  } from 'vue-router';
-// import { useToast } from 'primevue/usetoast';
+import { useToast } from 'primevue/usetoast';
 
 // API
 import SurveyService from '@/api/SurveyService';
+import {loadByID_SurveyController, postSubmit_SurveyController, loadAnswared_SurveyController} from '@/controllers/SurveyController';
 import { FormPreview } from '@/api/DataVariable';
 
-// const toast = useToast();
+const toast = useToast();
 const router = useRouter();
 const route = useRoute();
 const time = ref(3000)
@@ -18,6 +19,7 @@ const answare = ref([{id_pertanyaan:null, type:'',value:null}]);
 const selectedCategories = ref()
 const payload = JSON.parse(localStorage.getItem('payload'));
 const roles = localStorage.getItem('roles');
+const loading = ref(false)
 
 // Kondisi form sudah di submit(true) jika belum (false)
 const finished = ref('-');
@@ -32,19 +34,27 @@ onMounted(() => {
     loadSurvey()
 });
 
-const loadSurvey = () => {
-    SurveyService.getSurveyID(params).then(res => {
-        const load = res.data;
-        if (load.code == 200) {
-            const data = load.survey;
-            surveys.value = {
-                from: data.from,
-                to: data.to,
-                desc: data.desc,
-                title: data.title,
-                id: data.id,
+const loadSurvey = async() => {
+    loading.value = true
+    try {
+        const answared = await loadAnswared_SurveyController()
+        if (answared != null) {
+            const filter_ans = answared.find(item => item.id == params);
+            if (filter_ans != null) {
+                finished.value = 'sudah'
+                loading.value = false
             }
-            const sp = data.survey_pertanyaans
+        } else {
+            const response = await loadByID_SurveyController(params);
+            surveys.value = {
+                from: response.from,
+                to: response.to,
+                desc: response.desc,
+                title: response.title,
+                id: response.id,
+            }
+            const sp = response.survey_pertanyaans
+            const list = []
             for (let i = 0; i < sp.length; i++) {
                 const question = sp[i].questions;
                 const questions = [];
@@ -53,12 +63,19 @@ const loadSurvey = () => {
                 // Proses penambahan v-model yaitu "model" sebagai media input komponen form
                 for (let a = 0; a < question.length; a++) {
                     let model;
+                    let extra;
                     if (question[a].type == 'checkbox') {
                         model = [];
+                        extra = '';
                     } else if (question[a].type == 'number') {
                         model = 0;
+                        extra = '';
+                    } else if (question[a].type == 'radio') {
+                        model = '';
+                        extra = '';
                     } else {
                         model = '';
+                        extra = '';
                     }
                     const options = question[a].options
                     options.sort((a, b) => a.id - b.id);
@@ -72,104 +89,28 @@ const loadSurvey = () => {
                         options: options,
                         pivot: question[a].pivot,
                         model: model,
-                        model_extra: '',
+                        model_extra: extra,
                     }
                 }
-                pertanyaan.value[i] = {
+                list[i] = {
                     id: sp[i].id,
                     value: sp[i].value,
                     question: questions,
                 }
             }
-            console.log(pertanyaan.value);
-            console.log(sp);
-        } else {
-            surveys.value = {from: '', to:'', title:'', desc:'', id:0}
+            loading.value = false
+            pertanyaan.value = list
         }
-    })
+    } catch (error) {
+        loading.value = false
+        surveys.value = {from: '', to:'', title:'', desc:'', id:0}
+    }
 }
 
 const submitForm = async () => {
-    console.log(pertanyaan.value);
-    const pertanyaans = pertanyaan.value;
-    let answare = '{"answer": {';
-    for (let i = 0; i < pertanyaans.length; i++) {
-        answare += `"sp-${pertanyaans[i].id}":{`;
-        const question = pertanyaans[i].question;
-        answare += '"jawaban":"'
-        let jawaban = '';
-        for (let a = 0; a < question.length; a++) {
-            // Jawaban string
-            jawaban += question[a].id+'|';
-            if (question[a].type == 'checkbox') {
-                const model = question[a].model;
-                for (let b = 0; b < model.length; b++) {
-                    jawaban += model[b]
-                    if (b < (model.length-1)) {
-                        jawaban +='~';
-                    }
-                }
-            } else {
-                jawaban += question[a].model
-            }
-            if (a < (question.length - 1)) {
-                jawaban += ';';
-            } else {
-                jawaban += '",';
-            }
-        }
-        // Extra string
-        jawaban += '"extra":';
-        let ext = '';
-        let firstIndexWithData = true;
-        for (let a = 0; a < question.length; a++) {
-            const options = question[a].options;
-            const model = question[a].model;
-            for (let b = 0; b < options.length; b++) {
-                if (options[b].extra_answer != "0" && model == options[b].id) {
-                    if (!firstIndexWithData) {
-                        ext += ', '; // Add a comma if it's not the first index with data
-                    } else {
-                        ext += '{'; // Add "{" for the first index with data
-                        firstIndexWithData = false; // Set the flag to false after adding "{"
-                    }
-                    ext += `"ext-${options[b].id}":"${options[b].model_extra}"`
-                }
-            }
-        }
-        if (!firstIndexWithData) {
-            ext += '}'; // Add "}" if there was data in the options
-        }
-
-        if (ext == '') {
-            ext += 'null'
-        }
-        jawaban += ext
-        answare += jawaban;
-        if (i >= (pertanyaans.length - 1)) {
-            answare += '}';
-        } else {
-            answare += '},';
-        }
-    }
-    answare +='}}';
-    const postAnswer = JSON.parse(answare)
-    // console.log(answare);
-
-    // toast.add({ severity: 'success', summary: 'Successfully', detail: `Filling in the survey data has been completed`, life: 3000 });
-    SurveyService.postAnswerSurvey(params, postAnswer).then(res => {
-        const load = res.data;
-        console.log(load)
-        finished.value = 'sukses';
-    }).catch(error => {
-        console.log(error.response.data)
-        const code = error.response.data.code;
-        if (code == 400) {
-            finished.value = 'sudah';
-        } else {
-            finished.value = 'error';
-        }
-    });
+    const response = await postSubmit_SurveyController(params, pertanyaan.value)
+    finished.value = response.finish
+    toast.add({ severity: response.severity, summary: 'Info', detail: response.message, life: 5000 });
 }
 
 const link = () => {
@@ -180,8 +121,14 @@ const link = () => {
 
 <template>
     <div class="flex justify-content-center min-h-screen overflow-hidden pb-6 bg-contain" style="background-image: url('/layout/bg4.jpg');">
-        <!-- <Toast position="bottom-center"/> -->
-        <div class="grid w-full justify-content-center">
+        <Toast position="top-center"/>
+        <div class="flex align-items-center justify-content-center mb-3" v-if="loading == true">
+            <div class="">
+                <ProgressSpinner aria-label="Loading" style="width: 50px; height: 50px" />
+            </div>
+            <div class="font-semibold">Please wait ...</div>
+        </div>
+        <div class="grid w-full justify-content-center" v-else>
             <div class="col-12 md:col-8 sm:col-8 bg-white mt-6 border-round-md" v-show="finished == '-'">
                 <div class="flex justify-content-between py-6 px-4 bg-no-repeat bg-cover border-round-md shadow-2" style="background-image: url('/layout/bg2.jpg');">
                     <div class="">
@@ -214,12 +161,19 @@ const link = () => {
                         </div>
                         <div v-show="question.type == 'checkbox'">
                             <div v-for="options in question.options" :key="options.id" class="my-1 flex align-items-center">
-                                <Checkbox :value="options.id" v-model="question.model" />
-                                <label class="ml-2">{{ options.description }}</label>
+                                <div class="flex flex-column gap-2 w-full">
+                                    <div class="flex gap-2">
+                                        <Checkbox :value="options.id" v-model="question.model" />
+                                        <label class="ml-2">{{ options.description }}</label>
+                                    </div>
+                                    <div class="flex w-full" v-if="options.extra_answer == '1'">
+                                        <InputText type="text" v-model="question.model_extra" :placeholder="`Jika ${options.description}, berikan alasannya`" class="w-full"/>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div v-show="question.type == 'text'">
-                            <InputText id="text" type="text" class="w-full my-2" v-model="question.model"/>
+                            <InputText type="text" class="w-full my-2" v-model="question.model"/>
                         </div>
                         <div v-show="question.type == 'radio'" class="my-1">
                             <div v-for="options in question.options" :key="options.id" class="my-1">
@@ -228,7 +182,7 @@ const link = () => {
                                     <label class="ml-2">{{ options.description }}</label>
                                 </div>
                                 <div class="mt-2">
-                                    <InputText :placeholder="`Jika ${options.description}, berikan alasannya`" v-model="options.model_extra" v-show="options.extra_answer == '1'" class="w-full"/>
+                                    <InputText :placeholder="`Jika ${options.description}, berikan alasannya`" v-model="question.model_extra" v-show="options.extra_answer == '1'" class="w-full"/>
                                 </div>
                             </div>
                         </div>

@@ -7,6 +7,8 @@ import { useRouter } from 'vue-router';
 // API
 import {formSurvey, listSurvey} from '@/api/DataVariable';
 import SurveyService from '@/api/SurveyService';
+import {loadAll_SurveyController} from '@/controllers/SurveyController';
+import moment from 'moment';
 
 
 // Variable
@@ -61,34 +63,36 @@ const previewQuestion2 = (path) => {
     // router.push({path:`/form/preview/${id}`, query:{title: title, desc:desc}, target: '_blank'});
 }
 
-const loadSurvey = () => {
-    SurveyService.getSurvey().then(res => {
-        const load = res.data;
-        if (load.code == 200) {
-            const data = load.data;
-            const list = [];
-            for (let i = 0; i < data.length; i++) {
-                list[i] = {
-                    id: data[i].id,
-                    title: data[i].title.toUpperCase(),
-                    desc: data[i].desc,
-                    from: data[i].from,
-                    to: data[i].to,
-                    status: data[i].status,
-                }
+const loadSurvey = async() => {
+    try {
+        const response = await loadAll_SurveyController();
+        const list = [];
+        for (let i = 0; i < response.length; i++) {
+            const froms = Number(moment(response[i].from).format('YYYYMMDD'));
+            const to = Number(moment(response[i].to).format('YYYYMMDD'));
+            const now = Number(moment().format('YYYYMMDD'));
+            list[i] = {
+                id: response[i].id,
+                title: response[i].title.toUpperCase(),
+                desc: response[i].desc,
+                from: response[i].from,
+                to: response[i].to,
+                status: response[i].status,
+                // kondisi: response[i].status == "0" ? "Non Active" : from,
+                kondisi: response[i].status == "0" 
+                ? "Non Active" 
+                : (froms <= now && to >= now) 
+                    ? "Active" 
+                    : "Expired",
             }
-            list_Survey.value = list;
-            loadings.value = false;
-        } else {
-            list_Survey.value = [];
-            loadings.value = false;
         }
-    })
-    .catch(error => {
+        console.log(list)
+        list_Survey.value = list;
+        loadings.value = false;
+    } catch (error) {
         list_Survey.value = [];
         loadings.value = false;
-        console.error(error.response.status);
-    })
+    }
 }
 
 const filteredList = computed(() => {
@@ -179,8 +183,8 @@ const postDialog = () => {
                                     <div class="font-bold text-2xl">{{ slotProps.data.title }}</div>
                                     <div class="mb-3">{{ slotProps.data.desc }}</div>
                                     <Chip class="pl-0 pr-3 mb-2 cursor-pointer">
-                                        <span class="border-circle w-2rem h-2rem flex align-items-center justify-content-center" :class="slotProps.data.status == true ? 'bg-primary' : 'bg-red-500 text-white'"><i class="pi pi-check" v-if="slotProps.data.status == true"></i><i class="pi pi-times" v-else></i></span>
-                                        <span class="ml-2 font-medium">{{slotProps.data.status == "1" ? 'Active' : 'Non Active'}}</span>
+                                        <span class="border-circle w-2rem h-2rem flex align-items-center justify-content-center" :class="slotProps.data.kondisi == 'Active' ? 'bg-primary' : 'bg-red-500 text-white'"><i class="pi pi-check" v-if="slotProps.data.kondisi == 'Active'"></i><i class="pi pi-times" v-else></i></span>
+                                        <span class="ml-2 font-medium">{{slotProps.data.kondisi}}</span>
                                     </Chip>
                                     <!-- <Rating :modelValue="slotProps.data.rating" :readonly="true" :cancel="false" class="mb-2"></Rating> -->
                                     <div class="flex align-items-center">

@@ -7,6 +7,7 @@ import { useRouter } from 'vue-router';
 // API
 import {formSurvey, listSurvey} from '@/api/DataVariable';
 import QuestionService from '@/api/QuestionService';
+import {loadAll_QuestionController} from '@/controllers/QuestionController';
 
 
 // Variable
@@ -23,7 +24,7 @@ const forms = ref(formSurvey);
 const date = new Date();
 const statusdialog = ref(null);
 const list_Survey = ref([]);
-const loadings = ref(true)
+const loadings = ref(false)
 
 const payload = JSON.parse(localStorage.getItem('payload'));
 const breadcrumbHome = ref({ icon: 'pi pi-home', to: '/home' });
@@ -49,39 +50,28 @@ const editQuestion = (cond ,id) => {
     }
 }
 
-const loadSurvey = () => {
-    // loadings.value = true;
-    QuestionService.getQuestions().then(res => {
-        const load = res.data;
-        // console.log(load);
-        if (load.code == 200) {
-            const data = load.data;
-            // console.log(data);
-            const list = [];
-            data.sort((a, b) => a.id - b.id);
-            for (let i = 0; i < data.length; i++) {
-                list[i] = {
-                    id:data[i].id,
-                    question:data[i].question,
-                    type:data[i].type,
-                    require:data[i].require,
-                    // category_name:data[i].category.name,
-                    category_id:data[i].category_id,
-                    tot_answare:data[i].options.length,
-                }
+const loadSurvey = async() => {
+    loadings.value = true;
+    try {
+        const response = await loadAll_QuestionController();
+        const list = []
+        for (let i = 0; i < response.length; i++) {
+            list[i] = {
+                id:response[i].id,
+                question:response[i].question,
+                type:response[i].type,
+                require:response[i].require,
+                // category_name:data[i].category.name,
+                category_id:response[i].category_id,
+                tot_answare:response[i].options.length,
             }
-            list_Survey.value = list;
-            loadings.value = false;
-        } else {
-            list_Survey.value = [];
-            loadings.value = false;
         }
-    })
-    .catch(error => {
-        list_Survey.value = [];
+        list_Survey.value = list;
         loadings.value = false;
-        console.error(error.response.status);
-    })
+    } catch (error) {
+        loadings.value = false;
+        list_Survey.value = [];
+    }
 }
 
 const filteredList = computed(() => {
